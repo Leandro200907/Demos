@@ -1,0 +1,326 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Demo Módulo 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Presentación autoplay: una barra de procesos arriba, el relato en una tarjeta fija y debajo la pantalla que se completa sola paso a paso. */
+:root{
+  --bg:#F2F3F1; --surface:#FFFFFF; --ink:#16202B; --muted:#4F5B66; --line:#D9DDE0; --chip:#EDEFF1; --soft:#F7F7F6;
+  --accent:#1D4E89; --accent-ink:#FFFFFF;
+  --ok-bg:#E3F1E7; --ok:#166534; --warn-bg:#FDF1E3; --warn:#8A3B07; --bad-bg:#FBE7E5; --bad:#9B1C14; --info-bg:#E6EEF7; --info:#1D4E89;
+  --field-line:#C3C9CE;
+  --font:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif; --mono:'IBM Plex Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#10161C; --surface:#18212A; --ink:#E6EAEE; --muted:#9AA7B2; --line:#2B3640; --chip:#222D37; --soft:#1D2832;
+  --accent:#92BBEB; --accent-ink:#0B1520;
+  --ok-bg:#16301F; --ok:#6FCF90; --warn-bg:#3A2915; --warn:#F2B67F; --bad-bg:#3B1C1A; --bad:#F4A19A; --info-bg:#18293B; --info:#92BBEB;
+  --field-line:#3A4753; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10161C; --surface:#18212A; --ink:#E6EAEE; --muted:#9AA7B2; --line:#2B3640; --chip:#222D37; --soft:#1D2832;
+  --accent:#92BBEB; --accent-ink:#0B1520;
+  --ok-bg:#16301F; --ok:#6FCF90; --warn-bg:#3A2915; --warn:#F2B67F; --bad-bg:#3B1C1A; --bad:#F4A19A; --info-bg:#18293B; --info:#92BBEB;
+  --field-line:#3A4753; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);margin:0;padding-inline:16px;padding-block:20px 40px;font-size:16px;line-height:1.45}
+button,select{font-family:inherit;color:inherit}
+button:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.top{display:flex;flex-wrap:wrap;gap:6px 20px;align-items:baseline;justify-content:space-between}
+.top h1{margin:0;font-size:22px;font-weight:700;text-wrap:balance}
+.top .sub{color:var(--muted);font-size:14px}
+.procs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+@media (max-width:760px){.procs{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.proc{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 12px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:2px;min-width:0;min-height:64px}
+.proc small{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+.proc b{font-size:14px;font-weight:600;line-height:1.25}
+.proc.done{background:var(--ok-bg);border-color:transparent}.proc.done small{color:var(--ok)}
+.proc.now{background:var(--ink);border-color:var(--ink);color:var(--bg)}.proc.now small{color:var(--bg);opacity:.75}
+.nar{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:12px}
+.nar .meta{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between;font-size:13px;color:var(--muted);font-weight:600}
+.dots{display:flex;gap:6px}.dots i{width:22px;height:6px;border-radius:999px;background:var(--chip)}.dots i.d{background:var(--ok)}.dots i.n{background:var(--accent)}
+.nar h2{margin:0;font-size:24px;line-height:1.2;text-wrap:balance}
+.nar p{margin:0;font-size:18px;max-width:70ch;color:var(--ink)}
+.nar .txt{display:flex;flex-direction:column;gap:6px;animation:pop .3s ease-out;min-height:96px}
+.prog{height:4px;border-radius:999px;background:var(--chip);overflow:hidden}.prog i{display:block;height:100%;width:0;background:var(--accent)}
+.ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.cb{min-height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--field-line);background:var(--surface);font-weight:600;font-size:14px;cursor:pointer}
+.cb.main{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);min-width:112px}
+.ctl label{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px;margin-left:auto}
+.ctl select{min-height:44px;border-radius:10px;border:1px solid var(--field-line);background:var(--surface);padding:0 8px;font-size:14px}
+.stage{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.lbl{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+/* elementos que aparecen según el paso: ocupan su lugar desde el inicio para que nada salte */
+.rv{opacity:0;transform:translateY(4px);transition:opacity .35s,transform .35s;min-width:0}
+.rv.on{opacity:1;transform:none}
+.rv.fresh{animation:glow 1.6s ease-out}
+@keyframes glow{0%{box-shadow:0 0 0 3px var(--accent)}100%{box-shadow:0 0 0 3px transparent}}
+@keyframes pop{from{opacity:.3;transform:translateY(4px)}to{opacity:1;transform:none}}
+.sw{display:grid;min-width:0}.sw>*{grid-area:1/1}
+.pill{display:inline-block;font-size:13px;font-weight:600;padding:4px 10px;border-radius:999px;white-space:nowrap}
+.p-ok{background:var(--ok-bg);color:var(--ok)}.p-warn{background:var(--warn-bg);color:var(--warn)}.p-bad{background:var(--bad-bg);color:var(--bad)}.p-info{background:var(--info-bg);color:var(--info)}.p-mute{background:var(--chip);color:var(--muted)}
+.ic{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:999px;font-weight:700;font-size:15px;flex:none}
+.ic.ok{background:var(--ok);color:var(--surface)}.ic.old{background:var(--info-bg);color:var(--info);border:1.5px solid var(--info)}
+.ic.no{border:1.5px dashed var(--muted);color:var(--muted)}.ic.bad{background:var(--bad);color:var(--surface)}.ic.warn{background:var(--warn-bg);color:var(--warn);border:1.5px solid var(--warn)}
+.cell{display:flex;align-items:center;gap:8px;font-size:14px;min-width:0}
+.tbl{width:100%;border-collapse:collapse;font-size:15px}
+.tbl th{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl td{padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:0}
+.sx{overflow-x:auto}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:640px){.grid3{grid-template-columns:minmax(0,1fr)}}
+.fld{border:1px solid var(--field-line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;background:var(--soft)}
+.fld b{font-size:17px}
+.fld .ph{color:var(--muted)}
+.box{border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px;background:var(--soft)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.mono{font-family:var(--mono);font-size:14px}
+.note{font-size:14px;color:var(--muted)}
+.kpis{display:flex;flex-wrap:wrap;gap:8px}
+.kpis span{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border-radius:999px;background:var(--soft);border:1px solid var(--line);font-size:14px;font-weight:600}
+.qr{display:grid;grid-template-columns:repeat(9,10px);gap:2px;padding:8px;background:#fff;border:1px solid var(--line);border-radius:8px;flex:none}
+.qr i{width:10px;height:10px;background:#16202B}.qr i.o{background:#fff}
+.sel td{background:var(--info-bg)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:var(--muted)}
+.legend span{display:flex;align-items:center;gap:6px}.legend .ic{width:22px;height:22px;font-size:12px}
+.end{display:flex;flex-direction:column;gap:6px}
+.tl{display:flex;flex-direction:column;gap:8px;min-width:0}
+.tl-row,.tl-ax{display:grid;grid-template-columns:110px minmax(0,1fr);gap:10px;align-items:center}
+@media (max-width:560px){.tl-row,.tl-ax{grid-template-columns:78px minmax(0,1fr);font-size:13px}}
+.tl-tr{position:relative;height:56px;background:var(--soft);border-radius:6px;overflow:hidden}
+.tl-ticks{height:18px;background:none;overflow:visible}.tl-ticks span{position:absolute;font-size:12px;color:var(--muted);font-weight:600;transform:translateX(0)}
+.gb{position:absolute;top:4px;height:22px;border-radius:5px;font-size:11px;font-weight:600;display:flex;align-items:center;padding:0 6px;overflow:hidden;white-space:nowrap}
+.gb.g{background:var(--ok);color:var(--surface)}.gb.o{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn)}.gb.r{background:var(--bad);color:var(--surface)}
+.gb.pl{top:31px;height:20px;border:2px dashed var(--accent);background:var(--surface);color:var(--accent);z-index:2;padding:0 4px}
+.gb.pl.conf{border-color:var(--ink);color:var(--ink)}
+.tl-hoy{position:absolute;top:0;bottom:0;width:2px;background:var(--ink);z-index:3;padding:0!important}
+.sq{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px}.sq.g{background:var(--ok)}.sq.o{background:var(--warn-bg);border:1px solid var(--warn)}.sq.r{background:var(--bad)}.sq.pl{border:2px dashed var(--accent);background:var(--surface)}
+@media (prefers-reduced-motion:reduce){.rv,.nar .txt{transition:none;animation:none}.rv.fresh{animation:none}}
+</style>
+
+<div class="wrap">
+  <div class="top"><h1>Módulo 1 · Documentación habilitante</h1><span class="sub">Se completa solo. Podés pausar, retroceder o saltar de proceso.</span></div>
+  <div class="procs" id="procs" role="tablist" aria-label="Procesos"></div>
+  <section class="nar" aria-live="polite">
+    <div class="meta"><span id="ptitle"></span><div class="dots" id="dots"></div></div>
+    <div class="txt" id="txt"></div>
+    <div class="prog"><i id="prog"></i></div>
+    <div class="ctl">
+      <button class="cb" id="bPrev" type="button">Anterior</button>
+      <button class="cb main" id="bPlay" type="button">Pausar</button>
+      <button class="cb" id="bNext" type="button">Siguiente</button>
+      <button class="cb" id="bRest" type="button">Reiniciar</button>
+      <label>Velocidad
+        <select id="speed"><option value="0.7">Lenta</option><option value="1" selected>Normal</option><option value="1.5">Rápida</option></select>
+      </label>
+    </div>
+  </section>
+  <div class="stage" id="stage"></div>
+</div>
+
+<script>
+/* ---------- utilidades de vista ---------- */
+const rv=(at,html,o={})=>`<${o.tag||'div'} class="rv ${o.cls||''}" data-at="${at}" data-to="${o.to??99}">${html}</${o.tag||'div'}>`;
+const ic=(k)=>({ok:'<span class="ic ok" title="Al día">✓</span>',old:'<span class="ic old" title="Versión vieja">↻</span>',no:'<span class="ic no" title="No lo tiene">◌</span>',bad:'<span class="ic bad" title="No está en regla">✗</span>',warn:'<span class="ic warn" title="Vence pronto">!</span>'})[k];
+const pill=(c,t)=>`<span class="pill p-${c}">${t}</span>`;
+/* celda que cambia de estado: cada variante entra en su paso y sale cuando llega la siguiente */
+const sw=(vars)=>`<div class="sw">${vars.map(v=>rv(v[0],v[1],{to:v[2]})).join('')}</div>`;
+const legend=`<div class="legend"><span>${ic('ok')} Al día</span><span>${ic('old')} Versión vieja</span><span>${ic('no')} No lo tiene</span><span>${ic('bad')} No está en regla</span></div>`;
+
+/* ---------- los seis procesos ---------- */
+const P=[
+{short:'Qué pide la operadora',
+ steps:[
+  {t:'Primero: saber qué exige cada operadora',n:'Cada operadora pide documentos distintos según el lugar y el tipo de servicio. Ese listado se llama matriz de requisitos y lo carga el Responsable de legajos.'},
+  {t:'Elegir operadora, locación y servicio',n:'La matriz se arma para una combinación concreta. Acá: Vista, en Bandurria Sur, para trabajos de Slickline.'},
+  {t:'Partir de una plantilla',n:'No se empieza de cero. La plataforma ofrece una plantilla con lo habitual del rubro y se copia con un toque. Los requisitos son de cuatro tipos: empresa, persona, vehículo y equipo.'},
+  {t:'Marcar qué es obligatorio de verdad',n:'Bloqueante duro: sin eso nadie se asigna. Excepcionable: se puede autorizar con un motivo escrito. Esa marca decide qué pasa después, cuando llega una OC.'},
+  {t:'Publicar la versión',n:'La matriz queda con versión, fecha de vigencia y respaldo de dónde salió. Si la operadora cambia sus requisitos, se publica una versión nueva y la anterior queda en el historial.'}],
+ stage:()=>`
+  <div class="grid3">
+    <div class="fld"><span class="lbl">Operadora</span>${sw([[0,'<b class="ph">Elegir…</b>',0],[1,'<b>Vista</b>']])}</div>
+    <div class="fld"><span class="lbl">Locación</span>${sw([[0,'<b class="ph">Elegir…</b>',0],[1,'<b>Bandurria Sur</b>']])}</div>
+    <div class="fld"><span class="lbl">Tipo de servicio</span>${sw([[0,'<b class="ph">Elegir…</b>',0],[1,'<b>Slickline</b>']])}</div>
+  </div>
+  ${rv(2,`<div class="row"><span class="pill p-info">Plantilla global copiada</span><span class="note">Se puede editar línea por línea.</span></div>`)}
+  <div class="sx"><table class="tbl"><tr><th>Tipo</th><th>Requisito</th><th>Clasificación</th></tr>
+   ${[['Empresa','Seguro de responsabilidad civil','bad'],['Empresa','ART al día','bad'],['Persona','Apto médico','bad'],['Persona','Curso de seguridad en pozo','bad'],['Vehículo','VTV','warn'],['Vehículo','Seguro del vehículo','warn'],['Equipo','Certificado de calibración','warn']].map((r,i)=>`
+   <tr>${`<td>${rv(2,r[0])}</td><td>${rv(2,r[1])}</td>`}<td>${sw([[3,r[2]==='bad'?pill('bad','Bloqueante duro'):pill('warn','Excepcionable')]])}</td></tr>`).join('')}
+  </table></div>
+  ${rv(4,`<div class="box"><div class="row"><b>Matriz Vista · Bandurria Sur · Slickline</b>${pill('ok','Versión 1 · vigente')}</div>
+   <div class="note">Vigente desde 01/10 · Respaldo: mail de la operadora, adjunto · Una versión nueva empieza como mínimo al día siguiente.</div></div>`)}`},
+
+{short:'Documentos de cada recurso',
+ steps:[
+  {t:'Cada recurso tiene su legajo',n:'La empresa, cada persona, cada vehículo y cada equipo tienen un legajo con sus documentos y vencimientos.'},
+  {t:'Abrir el legajo del Técnico A',n:'Se ve de un vistazo qué documentos tiene cargados y cuáles faltan, comparado con lo que pide la matriz.'},
+  {t:'Subir un documento con su vencimiento',n:'Se adjunta el archivo y se carga la fecha de vencimiento. El estado se actualiza al instante.'},
+  {t:'Los vencimientos se ven por color',n:'Verde: vigente. Naranja: vence pronto. Rojo: vencido. El Responsable de legajos recibe el aviso con anticipación, antes de que bloquee un trabajo.'}],
+ stage:()=>`
+  <div class="kpis">${['Empresa · 1 legajo','Personas · 12','Vehículos · 5','Equipos · 8'].map(k=>`<span>${k}</span>`).join('')}</div>
+  ${rv(1,`<div class="lbl">Legajo · Técnico A</div>`)}
+  <div class="sx"><table class="tbl"><tr><th>Documento</th><th>Vence</th><th>Estado</th></tr>
+   <tr><td>${rv(1,'Curso de seguridad en pozo')}</td><td>${rv(1,'<span class="mono">14/03/2027</span>')}</td><td>${rv(1,`<div class="cell">${ic('ok')} Vigente</div>`)}</td></tr>
+   <tr><td>${rv(1,'Apto médico')}</td>
+     <td>${sw([[1,'<span class="note">—</span>',1],[2,'<span class="mono">20/11/2026</span>']])}</td>
+     <td>${sw([[1,`<div class="cell">${ic('no')} Falta cargar</div>`,1],[2,`<div class="cell">${ic('ok')} Vigente</div>`]])}</td></tr>
+   <tr><td>${rv(3,'Credencial H2S')}</td><td>${rv(3,'<span class="mono">12/10/2026</span>')}</td><td>${rv(3,`<div class="cell">${ic('warn')} Vence en 5 días</div>`)}</td></tr>
+   <tr><td>${rv(3,'Licencia de conducir')}</td><td>${rv(3,'<span class="mono">30/09/2026</span>')}</td><td>${rv(3,`<div class="cell">${ic('bad')} Vencida</div>`)}</td></tr>
+  </table></div>
+  ${rv(2,`<div class="box"><div class="row"><span class="pill p-info">Archivo adjunto</span><span class="mono">apto_medico_tecnico_A.pdf</span></div><div class="note">Vencimiento cargado: 20/11/2026.</div></div>`,{to:2})}
+  ${rv(3,`<div class="box"><b>Aviso al Responsable de legajos</b><div class="note">Credencial H2S del Técnico A vence en 5 días. Licencia de conducir vencida desde el 30/09.</div></div>`)}`},
+
+{short:'¿Quién puede ir a la OC?',
+ steps:[
+  {t:'Llega una orden de compra',n:'Una línea de OC pide Slickline en Bandurria Sur para Vista. La plataforma busca la matriz vigente de esa combinación.'},
+  {t:'Se revisa recurso por recurso',n:'Cada técnico, vehículo y equipo candidato se compara contra la matriz, documento por documento. Esa cuenta la hace el sistema, no una persona con una planilla.'},
+  {t:'Resultado: quién queda habilitado',n:'Técnico A y Winche 1 cumplen. El Técnico B tiene el apto médico vencido: es bloqueante duro, no se puede asignar. La Camioneta 1 tiene el seguro por vencer: es excepcionable.'},
+  {t:'Autorizar una excepción con motivo',n:'Lo excepcionable se puede aprobar. El Responsable de legajos autoriza y escribe el motivo. Queda registrado quién, cuándo y por qué.'},
+  {t:'Solo se asigna a los habilitados',n:'El tablero de asignación del Módulo 2 ofrece únicamente a quienes pasaron esta revisión. Así no sale a campo nadie que después la operadora rechace.'}],
+ stage:()=>`
+  <div class="box"><div class="row"><b>OC 4500123 · línea 20</b>${pill('info','Matriz Vista v1')}</div><div class="note">Slickline · Bandurria Sur · Vista</div></div>
+  <div class="sx"><table class="tbl"><tr><th>Recurso</th><th>Revisión</th><th>Detalle</th></tr>
+   ${[
+    ['Técnico A',[[2,ic('ok')+' Habilitado']],''],
+    ['Técnico B',[[2,ic('bad')+' Bloqueado']],'Apto médico vencido · bloqueante duro'],
+    ['Camioneta 1',[[2,ic('warn')+' Excepcionable',3],[3,ic('ok')+' Autorizado con excepción']],'Seguro del vehículo vence en 5 días'],
+    ['Winche 1',[[2,ic('ok')+' Habilitado']],'']
+   ].map(r=>`<tr><td>${rv(1,r[0])}</td><td>${sw([[1,'<span class="note">Verificando…</span>',1],...r[1].map(v=>[v[0],`<div class="cell">${v[1]}</div>`,v[2]])])}</td><td>${rv(2,`<span class="note">${r[2]}</span>`)}</td></tr>`).join('')}
+  </table></div>
+  ${rv(3,`<div class="box"><b>Excepción · Camioneta 1</b><div class="note">Autoriza: Responsable de legajos · Motivo: [MOTIVO] · Vale hasta el vencimiento del seguro.</div></div>`)}
+  ${rv(4,`<div class="box"><div class="row"><b>Se puede asignar</b>${pill('ok','Técnico A')}${pill('ok','Camioneta 1')}${pill('ok','Winche 1')}</div><div class="row"><b>No se puede asignar</b>${pill('bad','Técnico B')}</div></div>`)}`},
+
+{short:'Qué le falta a la operadora',
+ steps:[
+  {t:'Antes de enviar: ¿qué tiene ya la operadora?',n:'Mandar todo cada vez es lento y genera confusión. La plataforma compara contra lo que Vista ya tiene y propone enviar solo lo que falta.'},
+  {t:'Cargar lo que Vista ya tiene',n:'Se sube la planilla que se baja del portal de la operadora. El sistema lee cada documento y lo asocia al recurso correspondiente.'},
+  {t:'La grilla muestra el estado de cada uno',n:'Un ícono por documento. Se lee sin leer texto: tilde, flecha de actualización, círculo vacío o cruz.'},
+  {t:'Se separa lo que hay que enviar',n:'Se envía lo que Vista no tiene o tiene vencido. Lo que Vista rechazó se corrige antes de reenviar.'},
+  {t:'Armar el envío',n:'Con un toque se genera un enlace con código QR y un ZIP con los archivos ordenados, solo con lo faltante.'},
+  {t:'Marcar que se subió',n:'Cuando se sube al portal, se marca. Queda en estado pendiente de aceptación, con fecha y responsable.'},
+  {t:'La operadora responde',n:'Vista acepta dos y rechaza uno. El rechazo bloquea ese requisito en las OC de Vista hasta corregirlo. Aceptado queda con tilde.'}],
+ stage:()=>{
+  const rows=[
+   ['Seguro de responsabilidad civil · Empresa',[[2,'ok']],false],
+   ['ART al día · Empresa',[[2,'ok']],false],
+   ['Curso de seguridad en pozo · Técnico A',[[2,'old',4],[6,'ok']],true],
+   ['Apto médico · Técnico A',[[2,'no',4],[6,'ok']],true],
+   ['VTV · Camioneta 1',[[2,'no',4],[6,'bad']],true],
+   ['Calibración · Winche 1',[[2,'bad']],false]];
+  const txt={ok:'Al día',old:'Versión vieja',no:'No lo tiene',bad:'No está en regla'};
+  return `
+  <div class="row">${rv(1,`<span class="pill p-info">planilla_portal_vista.xlsx</span>`)}${rv(1,`<span class="note">6 documentos leídos</span>`)}</div>
+  <div class="sx"><table class="tbl"><tr><th>Documento y recurso</th><th>Vista tiene</th><th>Envío</th></tr>
+   ${rows.map(r=>`<tr class="${r[2]?'tr-env':''}"><td>${rv(2,r[0])}</td>
+    <td>${sw(r[1].map(v=>[v[0],`<div class="cell">${ic(v[1])} ${txt[v[1]]}</div>`,v[2]]).concat(r[2]?[[5,`<div class="cell">${pill('info','Pendiente de aceptación')}</div>`,5]]:[]))}</td>
+    <td>${r[2]?sw([[3,pill('warn','A enviar'),4],[4,pill('warn','En el envío'),4],[5,pill('info','Enviado'),5],[6,r[0].startsWith('VTV')?pill('bad','Rechazado'):pill('ok','Aceptado')]]):sw([[3,r[0].startsWith('Calib')?pill('bad','Corregir antes'):pill('ok','No hace falta')]])}</td></tr>`).join('')}
+  </table></div>
+  ${rv(2,legend)}
+  ${rv(3,`<div class="kpis"><span>${ic('ok')} 2 al día</span><span>${ic('old')} 1 versión vieja</span><span>${ic('no')} 2 no lo tiene</span><span>${ic('bad')} 1 no está en regla</span></div>`)}
+  ${rv(4,`<div class="box"><div class="row" style="flex-wrap:nowrap;align-items:flex-start"><div class="qr">${Array.from({length:81},(_,i)=>`<i class="${(i*7+(i>>3)*5)%3===0?'o':''}"></i>`).join('')}</div>
+    <div style="display:flex;flex-direction:column;gap:6px;min-width:0"><b>Envío para Vista · 3 documentos</b><span class="mono" style="overflow-wrap:anywhere">[ENLACE DEL ENVÍO]</span><span class="note">También en un ZIP con los archivos ordenados por recurso.</span></div></div></div>`)}
+  ${rv(6,`<div class="box"><b>Rechazo de VTV · Camioneta 1</b><div class="note">Motivo informado por Vista: [MOTIVO]. Mientras no se corrija, la Camioneta 1 queda bloqueada en las OC de Vista.</div></div>`)}`}},
+
+{short:'Vencimientos y cambios',
+ steps:[
+  {t:'Los documentos vencen y las reglas cambian',n:'La documentación nunca queda quieta. Este proceso muestra cómo se mantiene al día sin planillas ni recordatorios en el calendario.'},
+  {t:'Aviso antes del vencimiento',n:'Cuando un documento está por vencer, el Responsable de legajos recibe la alerta con anticipación, con el recurso, el documento y los días que faltan.'},
+  {t:'Renovar y avisar a la operadora',n:'Se carga el documento nuevo. La plataforma lo detecta distinto de lo que tiene Vista y lo pone en la lista de envío, con la flecha de actualización.'},
+  {t:'La operadora cambia sus requisitos',n:'Vista agrega un requisito nuevo. Se publica una versión nueva de la matriz, con fecha de vigencia y respaldo, sin tocar la versión anterior.'},
+  {t:'Ver el impacto antes de que moleste',n:'El sistema muestra a quién deja afuera el requisito nuevo y qué documento falta subir. Así se corrige antes de que una OC se frene.'}],
+ stage:()=>`
+  ${rv(1,`<div class="box"><div class="row"><span class="ic warn">!</span><b>Credencial H2S · Técnico A</b>${pill('warn','Vence en 5 días')}</div><div class="note">Aviso para: Responsable de legajos</div></div>`)}
+  ${rv(2,`<div class="sx"><table class="tbl"><tr><th>Documento</th><th>Archivo</th><th>Vista tiene</th></tr>
+   <tr><td>Credencial H2S · Técnico A</td><td><span class="mono">credencial_h2s_v2.pdf</span> · vence 12/10/2027</td><td>${sw([[2,`<div class="cell">${ic('old')} Versión vieja · pendiente de envío</div>`]])}</td></tr></table></div>`)}
+  ${rv(3,`<div class="box"><div class="row"><b>Matriz Vista · Bandurria Sur · Slickline</b>${pill('info','Versión 2 · desde 15/10')}</div><div class="note">Se agrega: Curso de manejo defensivo (Persona) · Bloqueante duro. Respaldo: mail de la operadora, adjunto.</div></div>`)}
+  ${rv(4,`<div class="sx"><table class="tbl"><tr><th>Recurso</th><th>Estado con la versión 2</th><th>Qué falta</th></tr>
+   <tr><td>Técnico A</td><td><div class="cell">${ic('bad')} Quedaría bloqueado desde el 15/10</div></td><td>Curso de manejo defensivo</td></tr>
+   <tr><td>Técnico B</td><td><div class="cell">${ic('bad')} Quedaría bloqueado desde el 15/10</div></td><td>Curso de manejo defensivo y apto médico</td></tr>
+   <tr><td>Camioneta 1</td><td><div class="cell">${ic('ok')} Sin cambios</div></td><td></td></tr></table></div>`)}`}
+,{short:'Línea de tiempo',
+ steps:[
+  {t:'Última pantalla: la línea de tiempo',n:'Reúne en un solo dibujo todo lo anterior: hasta cuándo está habilitado cada recurso para trabajar en Vista.'},
+  {t:'Cada barra es una habilitación',n:'Verde: todos los documentos vigentes. Naranja: algún documento vence en menos de 30 días. Rojo: no habilitado. La barra cambia de color en la fecha del primer vencimiento.'},
+  {t:'En el Módulo 1 es solo informativa',n:'Sirve para mirar y anticipar. No asigna ni bloquea nada por sí sola: el bloqueo lo decide la matriz cuando llega una OC.'},
+  {t:'En el Módulo 2 es la base de la planificación',n:'Las OT planificadas se dibujan sobre esta línea. Si una OT cae sobre una barra roja, como la Camioneta 1 en noviembre, se ve antes de asignar.'},
+  {t:'Módulo 1 informa, Módulo 2 planifica',n:'Con el Módulo 1 sabés quién está en regla y qué le falta a cada operadora. Con el Módulo 2 usás esa información para asignar, ejecutar, certificar, facturar y cobrar.'}],
+ stage:()=>{
+  const D0=Date.UTC(2026,9,1),D1=Date.UTC(2027,2,31),SPAN=(D1-D0)/864e5;
+  const pos=(d,m,y)=>((Date.UTC(y,m-1,d)-D0)/864e5)/SPAN*100;
+  const bar=(at,a,b,c,lab,o={})=>`<div class="rv gb ${c} ${o.cls||''}" data-at="${at}" data-to="${o.to??99}" style="left:${a.toFixed(2)}%;width:${(b-a).toFixed(2)}%" title="${lab}">${lab}</div>`;
+  const T=0,hoy=pos(7,10,2026);
+  const rows=[
+   ['Técnico A',[[hoy,pos(21,10,2026),'g',''],[pos(21,10,2026),pos(21,11,2026),'o','Apto médico vence 20/11'],[pos(21,11,2026),100,'r','']],[pos(26,10,2026),pos(9,11,2026)]],
+   ['Técnico B',[[hoy,100,'r','Apto médico vencido']],null],
+   ['Camioneta 1',[[hoy,pos(13,10,2026),'o','Seguro'],[pos(13,10,2026),100,'r','Seguro vencido']],[pos(2,11,2026),pos(16,11,2026)]],
+   ['Winche 1',[[hoy,pos(15,1,2027),'g',''],[pos(15,1,2027),pos(16,2,2027),'o','Calibración vence 15/02'],[pos(16,2,2027),100,'r','']],[pos(26,10,2026),pos(9,11,2026)]]
+  ];
+  const meses=['Oct','Nov','Dic','Ene','Feb','Mar'];
+  const ticks=meses.map((m,i)=>{const mm=[10,11,12,1,2,3][i],yy=mm>=10?2026:2027;return `<span style="left:${pos(1,mm,yy).toFixed(2)}%">${m}</span>`}).join('');
+  return `
+  <div class="lbl">Habilitación por recurso · Vista · Bandurria Sur</div>
+  <div class="tl">
+   <div class="tl-ax"><div class="tl-lb"></div><div class="tl-tr tl-ticks">${ticks}</div></div>
+   ${rows.map(r=>`<div class="tl-row"><div class="tl-lb">${rv(1,r[0])}</div><div class="tl-tr">
+     ${r[1].map(s=>bar(1,s[0],s[1],s[2],s[3])).join('')}
+     ${r[2]?bar(3,r[2][0],r[2][1],'pl','OT plan.',{cls:r[0]==='Camioneta 1'?'conf':''}):''}
+     ${rv(1,'',{cls:'tl-hoy" style="left:'+hoy.toFixed(2)+'%'})}
+   </div></div>`).join('')}
+  </div>
+  ${rv(1,`<div class="legend"><span><i class="sq g"></i> Todo vigente</span><span><i class="sq o"></i> Vence en menos de 30 días</span><span><i class="sq r"></i> No habilitado</span><span><i class="sq pl"></i> OT planificada</span></div>`)}
+  ${rv(2,`<div class="box"><div class="row"><span class="pill p-info">Módulo 1</span><b>Solo informativa</b></div><div class="note">Muestra y anticipa. La decisión de bloquear la toma la matriz cuando llega una OC.</div></div>`,{to:2})}
+  ${rv(3,`<div class="box"><div class="row"><span class="pill p-warn">Módulo 2</span><b>Planificación y asignación</b></div><div class="note">Camioneta 1 tiene una OT planificada del 02/11 al 16/11, con el seguro vencido: se detecta antes de asignar.</div></div>`,{to:3})}
+  ${rv(4,`<div class="grid3"><div class="box"><span class="pill p-info">Módulo 1</span><b>Informa</b><span class="note">Matriz, legajos, habilitados, qué le falta a cada operadora.</span></div><div class="box"><span class="pill p-warn">Módulo 2</span><b>Planifica y cobra</b><span class="note">Asignación, OT en el celular, firma, certificado, factura y cobro.</span></div><div class="box"><span class="pill p-ok">Juntos</span><b>De punta a punta</b><span class="note">Nadie sale a campo sin estar en regla y todo lo hecho se cobra.</span></div></div>`)}`}}
+];
+
+/* ---------- motor ---------- */
+const $=id=>document.getElementById(id);
+let pi=0,si=0,playing=true,spd=1,el=0,last=0,finished=false;
+const dur=()=>Math.max(5200,2200+P[pi].steps[si].n.length*34)/spd;
+function buildProcs(){
+  $('procs').innerHTML=P.map((p,i)=>`<button type="button" class="proc" role="tab" data-p="${i}"><small>Proceso ${i+1}</small><b>${p.short}</b></button>`).join('');
+}
+function paintProcs(){document.querySelectorAll('.proc').forEach((b,i)=>{b.className='proc'+(i<pi||(finished&&i===pi)?' done':'')+(i===pi&&!finished?' now':'');b.setAttribute('aria-selected',i===pi)})}
+function applyStep(first){
+  const p=P[pi],s=p.steps[si];
+  $('ptitle').textContent=`Proceso ${pi+1} de ${P.length} · paso ${si+1} de ${p.steps.length}`;
+  $('dots').innerHTML=p.steps.map((_,i)=>`<i class="${i<si?'d':i===si?'n':''}"></i>`).join('');
+  $('txt').innerHTML=`<h2></h2><p></p>`;$('txt').querySelector('h2').textContent=s.t;$('txt').querySelector('p').textContent=s.n;
+  document.querySelectorAll('#stage [data-at]').forEach(e=>{
+    const a=+e.dataset.at,t=+e.dataset.to;e.classList.toggle('on',a<=si&&si<=t);
+    e.classList.remove('fresh');if(!first&&a===si){void e.offsetWidth;e.classList.add('fresh')}
+  });
+  paintProcs();
+}
+function loadProc(i,s){pi=i;si=s||0;finished=false;$('stage').innerHTML=P[pi].stage();el=0;applyStep(true)}
+function next(){
+  if(si<P[pi].steps.length-1){si++;el=0;applyStep()}
+  else if(pi<P.length-1){loadProc(pi+1,0)}
+  else{finished=true;playing=false;$('bPlay').textContent='Ver de nuevo';paintProcs()}
+}
+function prev(){
+  if(finished){finished=false;si=P[pi].steps.length-1;el=0;applyStep();$('bPlay').textContent='Reanudar';return}
+  if(si>0){si--;el=0;applyStep()}else if(pi>0){loadProc(pi-1,P[pi-1].steps.length-1)}
+}
+function tick(ts){
+  if(!last)last=ts;const d=ts-last;last=ts;
+  if(playing&&!finished){el+=d;if(el>=dur())next();$('prog').style.width=Math.min(100,el/dur()*100)+'%'}
+  else if(finished)$('prog').style.width='100%';
+  requestAnimationFrame(tick);
+}
+$('procs').addEventListener('click',e=>{const b=e.target.closest('.proc');if(b)loadProc(+b.dataset.p,0)});
+$('bNext').onclick=next;$('bPrev').onclick=prev;
+$('bRest').onclick=()=>{playing=true;$('bPlay').textContent='Pausar';loadProc(0,0)};
+$('bPlay').onclick=()=>{
+  if(finished){playing=true;$('bPlay').textContent='Pausar';loadProc(0,0);return}
+  playing=!playing;$('bPlay').textContent=playing?'Pausar':'Reanudar';
+};
+$('speed').onchange=e=>{spd=+e.target.value};
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='SELECT')return;
+  if(e.key==='ArrowRight')next();else if(e.key==='ArrowLeft')prev();else if(e.key===' '&&e.target.tagName!=='BUTTON'){e.preventDefault();$('bPlay').click()}
+});
+buildProcs();loadProc(0,0);requestAnimationFrame(tick);
+</script>
+</body></html>

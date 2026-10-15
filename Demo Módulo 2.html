@@ -1,0 +1,463 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Demo Módulo 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: oficina a la izquierda, celular a la derecha; en pantallas angostas se apilan y arriba queda el lado que actúa. */
+:root{
+  --bg:#F2F3F1; --surface:#FFFFFF; --ink:#16202B; --muted:#4F5B66; --line:#D9DDE0; --chip:#EDEFF1;
+  --accent:#C2410C; --accent-ink:#FFFFFF; --bar:#16202B; --bar-ink:#FFFFFF; --bar-muted:#C9D1D9;
+  --ok-bg:#E3F1E7; --ok:#166534; --warn-bg:#FDF1E3; --warn:#8A3B07; --bad-bg:#FBE7E5; --bad:#9B1C14; --info-bg:#E6EEF7; --info:#1D4E89;
+  --field:#FFFFFF; --field-line:#C3C9CE; --soft:#F7F7F6; --bezel:#0E151C;
+  --font:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif; --mono:'IBM Plex Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#10161C; --surface:#18212A; --ink:#E6EAEE; --muted:#9AA7B2; --line:#2B3640; --chip:#222D37;
+  --accent:#F0743A; --accent-ink:#1A0E07; --bar:#0B1015; --bar-ink:#F1F4F6; --bar-muted:#8D9AA6;
+  --ok-bg:#16301F; --ok:#6FCF90; --warn-bg:#3A2915; --warn:#F2B67F; --bad-bg:#3B1C1A; --bad:#F4A19A; --info-bg:#18293B; --info:#92BBEB;
+  --field:#101820; --field-line:#3A4753; --soft:#1D2832; --bezel:#05080B; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10161C; --surface:#18212A; --ink:#E6EAEE; --muted:#9AA7B2; --line:#2B3640; --chip:#222D37;
+  --accent:#F0743A; --accent-ink:#1A0E07; --bar:#0B1015; --bar-ink:#F1F4F6; --bar-muted:#8D9AA6;
+  --ok-bg:#16301F; --ok:#6FCF90; --warn-bg:#3A2915; --warn:#F2B67F; --bad-bg:#3B1C1A; --bad:#F4A19A; --info-bg:#18293B; --info:#92BBEB;
+  --field:#101820; --field-line:#3A4753; --soft:#1D2832; --bezel:#05080B; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);margin:0;padding-inline:16px;padding-block:20px 40px;font-size:15px;line-height:1.4}
+button{font-family:inherit;color:inherit}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1240px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.top{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between}
+.top h1{margin:0;font-size:22px;font-weight:700;text-wrap:balance}
+.top .sub{color:var(--muted);font-size:14px}
+.reset{min-height:40px;padding:0 16px;border-radius:10px;border:1px solid var(--field-line);background:var(--surface);font-weight:600;font-size:14px;cursor:pointer}
+.steps{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;font-size:13px;font-weight:600;background:var(--surface);border:1px solid var(--line);color:var(--muted)}
+.chip.done{color:var(--ok);background:var(--ok-bg);border-color:transparent}
+.chip.now{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.hint{background:var(--info-bg);color:var(--info);border-radius:12px;padding:12px 16px;font-weight:600;font-size:15px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 410px;gap:24px;align-items:start}
+@media (max-width:960px){.stage{grid-template-columns:minmax(0,1fr)}.stage[data-focus="phone"] .phone-col{order:-1}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.lbl{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.who{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.pill{display:inline-block;font-size:13px;font-weight:600;padding:4px 10px;border-radius:999px;white-space:nowrap}
+.p-ok{background:var(--ok-bg);color:var(--ok)}.p-warn{background:var(--warn-bg);color:var(--warn)}.p-bad{background:var(--bad-bg);color:var(--bad)}.p-info{background:var(--info-bg);color:var(--info)}.p-mute{background:var(--chip);color:var(--muted)}
+.mono{font-family:var(--mono)}
+.btn{min-height:48px;padding:0 22px;border-radius:10px;border:0;background:var(--accent);color:var(--accent-ink);font-size:15px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;text-align:center}
+.btn.sec{background:var(--surface);color:var(--ink);border:1px solid var(--field-line)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btns{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.pipe{display:flex;flex-wrap:wrap;gap:6px}
+.pipe span{font-size:12px;font-weight:600;padding:5px 10px;border-radius:999px;background:var(--chip);color:var(--muted)}
+.pipe span.d{background:var(--ok-bg);color:var(--ok)}.pipe span.n{background:var(--accent);color:var(--accent-ink)}
+.row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line);min-height:48px}
+.row:last-child{border-bottom:0}
+.row .g{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.row small{color:var(--muted);font-size:13px}
+.list{border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.row.off{background:var(--soft);color:var(--muted)}
+input[type=checkbox]{width:20px;height:20px;accent-color:var(--accent);flex:none}
+.kv{display:grid;grid-template-columns:130px minmax(0,1fr);gap:8px 12px;font-size:14px}
+.kv dt{color:var(--muted)}.kv dd{margin:0}
+.bar{height:10px;border-radius:999px;background:var(--chip);overflow:hidden}.bar i{display:block;height:100%;background:var(--info)}
+.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tbl th{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+.tbl td{padding:12px 10px;border-bottom:1px solid var(--line)}
+.scroll-x{overflow-x:auto}
+.msg{background:var(--ok-bg);color:var(--ok);border-radius:10px;padding:10px 14px;font-weight:600;font-size:14px}
+.mail{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:14px;font-size:14px;display:flex;flex-direction:column;gap:6px}
+/* Celular */
+.phone-col{display:flex;flex-direction:column;gap:10px;align-items:center;min-width:0}
+.phone{width:100%;max-width:390px;height:800px;background:var(--bezel);border-radius:34px;padding:10px;box-shadow:0 18px 40px rgba(0,0,0,.22)}
+.screen{width:100%;height:100%;border-radius:26px;overflow:hidden;background:var(--bg);display:flex;flex-direction:column}
+.ph-head{background:var(--bar);color:var(--bar-ink);padding:16px 16px 14px;display:flex;align-items:center;gap:10px}
+.ph-head .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.ph-head .t b{font-size:17px}.ph-head .t span{font-size:13px;color:var(--bar-muted)}
+.sig{border:0;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer}
+.ph-body{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px}
+.ph-foot{background:var(--surface);border-top:1px solid var(--line);padding:12px 14px 16px;display:flex;flex-direction:column;gap:8px}
+.ph-foot .btn{width:100%;min-height:52px}
+.pc{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.oc-box{background:var(--info-bg);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:5px}
+.oc-box b{font-size:15px}.oc-box span{font-size:14px}
+.clock{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.tile{border-radius:10px;border:1px dashed var(--field-line);background:var(--surface);padding:10px 8px;display:flex;flex-direction:column;gap:2px;text-align:left;font-size:13px;cursor:pointer;min-height:58px}
+.tile b{font-size:13px}.tile.set{border:0;background:var(--ok-bg);color:var(--ok)}.tile.wait{border:0;background:var(--warn-bg);color:var(--warn)}
+.tile:disabled{opacity:.45;cursor:not-allowed}
+.photos{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.photos i{aspect-ratio:1;border-radius:8px;background:linear-gradient(135deg,var(--chip),var(--line))}
+.photos button{aspect-ratio:1;border-radius:8px;border:1px dashed var(--field-line);background:var(--surface);font-size:22px;cursor:pointer;color:var(--muted)}
+.pdf{display:flex;gap:14px;align-items:flex-start}
+.pdf .sheet{width:70px;height:92px;flex:none;border:1px solid var(--field-line);border-radius:4px;background:#fff;padding:8px;display:flex;flex-direction:column;gap:5px}
+.pdf .sheet i{display:block;height:4px;background:#C9D1D9;border-radius:2px}.pdf .sheet i:first-child{height:6px;width:70%;background:#16202B}.pdf .sheet i:last-child{margin-top:auto;height:14px;background:#E6EEF7}
+.sigbox{height:150px;border:1px dashed var(--field-line);border-radius:10px;background:var(--soft);position:relative;touch-action:none}
+.sigbox canvas{width:100%;height:100%;display:block;touch-action:none;cursor:crosshair}
+.sigbox span{position:absolute;bottom:8px;left:0;right:0;text-align:center;font-size:12px;color:var(--muted);pointer-events:none}
+.seg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.seg button{min-height:48px;border-radius:10px;border:1px solid var(--field-line);background:var(--surface);font-weight:600;font-size:15px;cursor:pointer}
+.seg button.on{border:2px solid var(--ok);background:var(--ok-bg);color:var(--ok)}
+.inp{min-height:44px;border:1px solid var(--field-line);border-radius:8px;padding:0 10px;font-family:inherit;font-size:15px;background:var(--field);color:var(--ink);width:100%}
+.trk{display:flex;flex-direction:column;gap:10px;font-size:14px}
+.trk div{display:flex;gap:10px;align-items:flex-start}
+.trk b{width:22px;height:22px;flex:none;border-radius:999px;border:1px solid var(--field-line);display:inline-flex;align-items:center;justify-content:center;font-size:12px;color:var(--muted)}
+.trk .ok b{background:var(--ok);border-color:var(--ok);color:#fff}.trk .wt b{background:var(--warn-bg);border-color:var(--warn);color:var(--warn)}
+.trk .wt{color:var(--warn)}
+.sim{border:1px dashed var(--accent);background:transparent;color:var(--accent);border-radius:10px;min-height:44px;font-weight:600;font-size:14px;cursor:pointer;width:100%}
+.note{font-size:13px;color:var(--muted)}
+.foot{color:var(--muted);font-size:13px}
+.stack{display:flex;flex-direction:column;gap:16px;min-width:0}
+.qgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:560px){.qgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.q{border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.q b{font-size:22px;font-weight:600;font-variant-numeric:tabular-nums}.q small{font-size:12px;color:var(--muted)}
+.gantt{display:flex;flex-direction:column;gap:8px;min-width:0}
+.grow{display:grid;grid-template-columns:84px minmax(0,1fr);gap:10px;align-items:center}
+.gl{font-size:12px;font-weight:600;color:var(--muted)}
+.gtr{position:relative;height:32px;background:var(--soft);border-radius:6px;overflow:hidden}
+.gs{position:absolute;top:3px;bottom:3px;border-radius:5px;font-size:11px;font-weight:600;display:flex;align-items:center;padding:0 6px;overflow:hidden;white-space:nowrap}
+.gs.w{background:var(--ok);color:var(--surface)}.gs.e{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn)}.gs.p{border:1px dashed var(--info);color:var(--info);background:transparent}
+.gs.u{background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.35) 0 6px,transparent 6px 12px);opacity:.85;border:1px dashed var(--ink)}.gs.live{animation:lv 1.2s infinite}@keyframes lv{50%{opacity:.45}}.gm{position:absolute;top:0;bottom:0;width:2px;background:var(--ink);opacity:.6}.gtaps{margin-left:94px;font-size:12px;display:flex;flex-wrap:wrap;gap:4px 12px}.gwait{position:absolute;inset:0;display:flex;align-items:center;padding:0 10px;font-size:12px;color:var(--muted)}
+.gax{position:relative;height:16px;margin-left:94px;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.gax span{position:absolute;transform:translateX(-50%)}
+.gsum{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;margin-left:94px}
+.log{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.log div{display:grid;grid-template-columns:104px minmax(0,1fr);gap:10px;padding:10px 12px;border-bottom:1px solid var(--line);font-size:14px}
+.log div:last-child{border-bottom:0}.log .mono{font-size:12px;color:var(--muted);padding-top:2px}
+.dsc{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.hint,.msg{animation:pop .25s ease-out}@keyframes pop{from{opacity:.4;transform:translateY(3px)}to{opacity:1;transform:none}}}
+</style>
+
+<div class="wrap">
+  <div class="top">
+    <div><h1>Módulo 2 · de la OT al cobro</h1><div class="sub">Oficina y celular en la misma pantalla. Apretá los botones para recorrer el proceso completo.</div></div>
+    <button class="reset" type="button" data-act="reset">Reiniciar demo</button>
+  </div>
+  <div class="steps" id="steps" aria-label="Etapas"></div>
+  <div class="hint" id="hint" role="status"></div>
+  <div class="stage" id="stage">
+    <div class="office-col" id="office"></div>
+    <div class="phone-col"><div class="phone"><div class="screen" id="phone"></div></div><div class="note" id="phone-note"></div></div>
+  </div>
+  <div class="foot">Datos de ejemplo. Lo que está entre corchetes, como [PRECIO], lo completa cada empresa. Las acciones del inspector y los plazos se simulan con botones.</div>
+</div>
+
+<script>
+const PRIMERA=96, TOTAL=160;
+const PIPE=['Línea de OC','Asignada','En ejecución','Esperando firma','Firmada','En el portal','Certificada','Facturada','Cobrada'];
+const PIDX=[0,1,2,3,3,4,5,5,6,7,8];
+const GRUPOS=[['Generar',[0]],['Celular',[1,2]],['OT y firma',[3,4]],['Portal y certificado',[5,6,7]],['Facturar y cobrar',[8,9,10]]];
+const HINTS=[
+ 'Supervisor: revisá los recursos habilitados y apretá Generar OT-0148.',
+ 'Técnico: la OT llegó al celular, aun sin señal. Apretá Empezar la OT.',
+ 'Técnico en el pozo: marcá Inicio, Espera y Fin, y apretá Terminar y generar la OT.',
+ 'La OT quedó generada. ¿El inspector está en el pozo? Elegí cómo firma.',
+ null,
+ 'Administración: la OT firmada llegó. Mirá cómo se completaron las seis cantidades, el Gantt y el historial. Bajá el paquete y subilo al portal.',
+ 'Administración: el sistema cuenta los días y reclama cada semana. El tiempo y el certificado se simulan solos.',
+ 'Administración: llegó el certificado. La app lo compara contra la OT.',
+ 'Administración: se factura lo certificado. La diferencia sigue en reclamo.',
+ 'Administración: cuando entre el pago, registralo.',
+ 'Listo. Recorriste el proceso de punta a punta.'
+];
+let S;
+function init(){S={sync:false,desc:false,log:[],logk:{},step:0,signal:true,mode:null,canal:'whatsapp',envio:'idle',ini:null,eIni:null,eFin:null,fin:null,tasks:[true,true,false],fotos:2,ink:false,conf:true,dl:false,dias:0,reclamos:0,msg:''};}
+init();
+const $=id=>document.getElementById(id);
+const fm=m=>String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
+const fh=n=>n.toFixed(2).replace('.',',')+' h';
+function horas(){if(S.ini==null||S.fin==null)return null;let e=(S.eIni!=null&&S.eFin!=null)?S.eFin-S.eIni:0;return (S.fin-S.ini-e)/60}
+function hOT(){const h=horas();return h==null?8:h}
+function conf(){return hOT()-(S.desc?0.25:0)}
+function cert(){return Math.max(conf()-2,0)}
+function hm(m){return Math.floor(m/60)+':'+String(m%60).padStart(2,'0')}
+function pill(t,k){return `<span class="pill p-${k}">${t}</span>`}
+function addLog(k,t,txt){if(S.logk[k])return;S.logk[k]=1;S.log.push([t,txt])}
+function syncNow(t){if(S.sync)return;S.sync=true;addLog('sy',t,'El celular recuperó señal y sincronizó los toques, las tareas y las fotos')}
+function go(n,msg){S.step=n;S.msg=msg||'';if(n===2){S.signal=false}
+  if(n>=1)addLog('a','07/10 07:10','OT-0148 generada y asignada al técnico · Supervisor');
+  if(n>=3)addLog('g','07/10 16:05','OT generada en el pozo · '+fh(hOT())+' productivas');
+  if(n>=5){addLog('f','07/10 16:40','Firmada por el inspector · conformó '+fh(conf()));syncNow('07/10 16:41')}
+  if(n>=6)addLog('s','08/10 09:15','Subida al portal de Vista · Administración');
+  if(n>=7)addLog('c','20/10 11:20','Certificado recibido de Vista');
+  if(n>=8)addLog('v','20/10 11:45','Certificado verificado · '+fh(conf()-cert())+' quedan en reclamo');
+  if(n>=9)addLog('fa','21/10 10:00','Factura registrada · '+fh(cert())+' × [PRECIO]');
+  if(n>=10)addLog('co','20/11 09:30','Cobro registrado · '+fh(cert()));
+  render()}
+
+function pipeStrip(){const i=PIDX[S.step];return `<div class="pipe">${PIPE.map((p,k)=>`<span class="${k<i?'d':k===i?'n':''}">${p}</span>`).join('')}</div>`}
+
+function otResumen(){return `<dl class="kv"><dt>OC / línea</dt><dd class="mono">4500123 / 20</dd><dt>Servicio</dt><dd>Slickline · registro de presión de fondo</dd><dt>Locación</dt><dd>Vista · Bandurria Sur · BS-1024</dd><dt>Personal</dt><dd>Juan Pérez, Lucía Fernández</dd><dt>Equipo</dt><dd class="mono">WINCH-PAT-01, PA100DE</dd></dl>`}
+
+function saldoBar(){const usado=S.step>=5?conf():0;const resta=PRIMERA-usado;const pct=Math.round((TOTAL-resta)/TOTAL*100);
+ return `<div><div style="display:flex;justify-content:space-between;font-size:14px"><span>Saldo de la línea 20</span><b>${fh(resta).replace(' h','')} de ${TOTAL} h</b></div><div class="bar" style="margin-top:6px"><i style="width:${pct}%"></i></div></div>`}
+
+function officeGenerar(){
+  return `<div class="card"><div class="who"><div class="lbl">1 · La línea de OC</div>${pill('Rol: Supervisor','info')}</div>
+    <div class="oc-box"><span class="mono">OC 4500123 · línea 20</span><b>Slickline · registro de presión de fondo</b><span>Vista · unidad: hora · precio: [PRECIO]</span></div>
+    ${saldoBar()}
+    <dl class="kv"><dt>Locación</dt><dd>Vista · Bandurria Sur · BS-1024</dd><dt>Fecha</dt><dd>07/10/2026</dd><dt>Cantidad</dt><dd>8 h planificadas</dd><dt>Inspector que firma</dt><dd>[NOMBRE DEL INSPECTOR] · Vista</dd></dl></div>
+    <div class="card"><div class="who"><div class="lbl">2 · Quién y con qué</div><span class="note">Habilitación según Módulo 1</span></div>
+    <div class="list">
+     <label class="row"><input type="checkbox" checked><span class="g"><b>Juan Pérez</b><small>Supervisor de slickline</small></span>${pill('Habilitado · 5 de 5','ok')}</label>
+     <label class="row"><input type="checkbox" checked><span class="g"><b>Lucía Fernández</b><small>Operadora de equipo</small></span>${pill('Habilitada · 5 de 5','ok')}</label>
+     <label class="row off"><input type="checkbox" disabled><span class="g"><b>María González</b><small>Apto médico rechazado por Vista</small></span>${pill('No habilitada','bad')}</label>
+     <label class="row"><input type="checkbox" checked><span class="g"><b class="mono">WINCH-PAT-01</b><small>Unidad de slickline</small></span>${pill('Habilitado','ok')}</label>
+     <label class="row"><input type="checkbox" checked><span class="g"><b class="mono">PA100DE</b><small>Camioneta</small></span>${pill('Habilitado','ok')}</label>
+     <label class="row off"><input type="checkbox" disabled><span class="g"><b class="mono">PA200FG</b><small>El seguro venció el 05/10</small></span>${pill('No habilitado','bad')}</label>
+    </div>
+    <div class="btns"><button class="btn" type="button" data-act="generar">Generar OT-0148</button><span class="note">Aparece en el celular del técnico.</span></div></div>`;
+}
+function officeVuelo(){
+  const s=S.step;
+  const est=['','Asignada · ya está en el celular del técnico','En ejecución · los datos del pozo llegan cuando el celular tenga señal','Generada · esperando la firma del inspector',
+    S.mode==='remoto'?(S.envio==='enviado'?'Firma pedida por '+(S.canal==='whatsapp'?'WhatsApp':'mail')+' · esperando al inspector':S.envio==='cola'?'Firma pendiente de envío · el celular sigue sin señal':'Generada · el técnico elige cómo firma'):'El inspector está firmando en el celular del técnico'][s];
+  return `<div class="card"><div class="who"><div class="lbl">OT-0148 · seguimiento</div>${pill('Rol: Supervisor','info')}</div>
+    ${pipeStrip()}<div style="font-size:17px;font-weight:600">${est}</div>${otResumen()}${saldoBar()}</div>`;
+}
+function q(n,v,w,e){
+  const st=e==='pend'?'border:1px dashed var(--field-line);background:var(--surface)':e==='baja'?'border:2px solid var(--accent);background:var(--warn-bg)':'border:1px solid var(--line);background:var(--soft)';
+  const col=e==='pend'?'var(--muted)':e==='baja'?'var(--warn)':'var(--ink)';
+  return `<div class="q" style="${st}"><span class="lbl">${n}</span><b style="color:${col}">${v}</b><small>${w}</small></div>`;
+}
+function cantidades(){
+  const s=S.step, sy=S.sync&&s>=3&&S.fin!=null;
+  const noSync=s>=3&&!S.sync;
+  return [
+    q('Planificada','8,00 h','Supervisor, al generar la OT','hecho'),
+    q('Ejecutada',sy?fh((S.fin-S.ini)/60):'—',noSync?'Pendiente: el celular no sincronizó':'Reloj del celular',sy?'hecho':'pend'),
+    q('Presentada',sy?fh(hOT()):'—','Horas productivas del parte',sy?'hecho':'pend'),
+    q('Conformada',s>=5?fh(conf()):'—','Inspector de Vista, al firmar',s>=5?(S.desc?'baja':'hecho'):'pend'),
+    q('Certificada',s>=8?fh(cert()):'—','Certificador de Vista',s>=8?'baja':'pend'),
+    q('Facturada',s>=9?fh(cert()):'—','Factura',s>=9?'hecho':'pend')
+  ].join('');
+}
+function gantt(){
+  const s=S.step, sy=S.sync&&s>=3&&S.fin!=null, L=420, R=1020;
+  const pos=m=>((m-L)/(R-L)*100).toFixed(2);
+  const seg=(a,b,c,t)=>`<div class="gs ${c}" style="left:${pos(a)}%;width:${((b-a)/(R-L)*100).toFixed(2)}%" title="${t}">${(b-a)/(R-L)*100<9?'':t}</div>`;
+  let real='', tapsTxt='';
+  const synced=S.sync&&s>=3, tapped=S.ini!=null;
+  const cls=c=>c+(synced||(S.signal&&s<3)?'':' u');
+  if(tapped){
+    const open=S.fin==null, endAll=S.fin!=null?S.fin:(S.eFin!=null?S.eFin:(S.eIni!=null?S.eIni:S.ini));
+    if(S.eIni!=null){
+      real+=seg(S.ini,S.eIni,cls('w'),'Trabajo · '+hm(S.eIni-S.ini));
+      if(S.eFin!=null){real+=seg(S.eIni,S.eFin,cls('e'),'Espera')+(S.fin!=null?seg(S.eFin,S.fin,cls('w'),'Trabajo · '+hm(S.fin-S.eFin)):'')}
+      else real+=`<div class="gs ${cls('e')} live" style="left:${pos(S.eIni)}%;width:${(40/(R-L)*100).toFixed(2)}%" title="Espera en curso"></div>`;
+    } else if(S.fin!=null) real+=seg(S.ini,S.fin,cls('w'),'Trabajo · '+hm(S.fin-S.ini));
+    else real+=`<div class="gs ${cls('w')} live" style="left:${pos(S.ini)}%;width:${(40/(R-L)*100).toFixed(2)}%" title="Trabajo en curso"></div>`;
+    const mk=(m,l)=>`<i class="gm" style="left:${pos(m)}%" title="${l} ${hm(m)}"></i>`;
+    real+=mk(S.ini,'Inicio')+(S.eIni!=null?mk(S.eIni,'Espera'):'')+(S.eFin!=null?mk(S.eFin,'Fin espera'):'')+(S.fin!=null?mk(S.fin,'Fin'):'');
+    tapsTxt=`<div class="gtaps"><span class="mono">Toques: Inicio ${hm(S.ini)}${S.eIni!=null?' · Espera '+hm(S.eIni)+(S.eFin!=null?'–'+hm(S.eFin):' (en curso)'):''}${S.fin!=null?' · Fin '+hm(S.fin):''}</span> ${synced?'<b style="color:var(--ok)">✓ sincronizado</b>':(S.signal?'<b style="color:var(--ok)">● en vivo</b>':'<b style="color:var(--warn)">◌ en el celular, sin señal: llega al volver</b>')}</div>`;
+  } else {
+    real=`<div class="gwait">Esperando el toque de Inicio en el celular</div>`;
+  }
+  let ticks='';for(let h=7;h<=17;h++){ticks+=`<span style="left:${pos(h*60)}%">${String(h).padStart(2,'0')}</span>`}
+  const esp=(S.eIni!=null&&S.eFin!=null)?(S.eFin-S.eIni):0;
+  const sum=sy?`<div class="gsum"><span>Tiempo en el pozo <b>${hm(S.fin-S.ini)}</b></span><span>Productivo <b>${hm(S.fin-S.ini-esp)}</b></span><span>Improductivo <b>${hm(esp)}</b></span></div>`:'';
+  return `<div class="gantt"><div class="gax">${ticks}</div>
+   <div class="grow"><span class="gl">Planificado</span><div class="gtr">${seg(450,930,'p','Planificado · 8:00')}</div></div>
+   <div class="grow"><span class="gl">Celular · OT-0148</span><div class="gtr">${real}</div></div>${tapsTxt}${sum}</div>`;
+}
+function lineaCard(){
+  const s=S.step; let notas='';
+  if(s>=5&&S.desc)notas+=`<div class="mail"><span>Se hicieron ${fh((S.fin-S.ini)/60)} y el inspector conformó <b>${fh(conf())}</b>: <b>0,25 h no se cobran</b> (demora en el montaje).</span></div>`;
+  if(s>=8)notas+=`<div class="mail"><span>El certificado reconoce <b>${fh(cert())}</b> sobre ${fh(conf())} conformadas: <b style="color:var(--bad)">${fh(conf()-cert())}</b> siguen en reclamo.</span></div>`;
+  return `<div class="card"><div class="who"><div class="lbl">Línea 20 · OT-0148</div>${pill(PIPE[PIDX[s]],'info')}</div>
+    <div class="note">Las seis cantidades de la línea. Cada una queda guardada y ninguna pisa a la otra.</div>
+    <div class="qgrid">${cantidades()}</div>${notas}
+    <div class="lbl">Gantt de la línea · 07/10</div>${gantt()}</div>`;
+}
+function historial(){
+  return `<div class="card"><div class="lbl">Historial de estados</div><div class="log">${S.log.slice().reverse().map(e=>`<div><span class="mono">${e[0]}</span><span>${e[1]}</span></div>`).join('')}</div></div>`;
+}
+function office(){
+  const s=S.step;
+  const main=s===0?officeGenerar():s<5?officeVuelo():officeAdm();
+  return `<div class="stack">${main}${s>=1?lineaCard()+historial():''}</div>`;
+}
+
+function officeAdm(){
+  const s=S.step; const h=conf(); const c=cert(); const msg=S.msg?`<div class="msg">${S.msg}</div>`:'';
+  let main='';
+  if(s===5){
+    main=`<div class="lbl">Para subir al portal</div>
+    <div class="scroll-x"><table class="tbl"><tr><th>OT</th><th>Servicio</th><th>Línea</th><th>Conformada</th><th>Estado</th></tr>
+    <tr><td class="mono">OT-0148</td><td>Slickline · registro de presión</td><td>20</td><td><b>${fh(h)}</b></td><td>${pill('Firmada','ok')}</td></tr></table></div>
+    <div class="mail"><b>Certificador de la OC</b><span>[NOMBRE] · [MAIL DEL CERTIFICADOR]</span></div>
+    <div class="btns"><button class="btn ${S.dl?'sec':''}" type="button" data-act="descargar">Descargar para el portal de Vista</button><button class="btn" type="button" data-act="subido" ${S.dl?'':'disabled'}>Marcar como subido</button></div>
+    <div class="note">Baja un ZIP con la OT firmada y un nombre ordenado. Después de subirlo al portal, marcalo acá.</div>${msg}`;
+  } else if(s===6){
+    main=`<div class="lbl">Esperando certificado</div>
+    <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><b style="font-size:34px;color:${S.dias>=7?'var(--warn)':'var(--ink)'}">${S.dias} días</b><span class="note">desde que se subió · ${S.reclamos} reclamo${S.reclamos===1?'':'s'} enviado${S.reclamos===1?'':'s'}</span></div>
+    ${S.reclamos?`<div class="mail"><div class="who"><b>Reclamo enviado automáticamente</b>${pill('Cada 7 días','info')}</div><span><b>Para:</b> [MAIL DEL CERTIFICADOR] <b>CC:</b> Administración</span><span><b>Asunto:</b> Certificado pendiente · OC 4500123 · 1.er reclamo</span><span>Seguimos esperando el certificado de la OT-0148 (línea 20, ${fh(h)}), subida al portal. Adjuntamos la OT firmada.</span></div>`:'<div class="note">Si en 7 días no llega, la app manda un mail de reclamo al certificador, con copia a Administración, y lo repite cada semana.</div>'}
+    <div class="btns"><button class="btn sec" type="button" data-act="dias">Simular: pasaron 7 días</button><button class="btn" type="button" data-act="llegoCert">Simular: llegó el certificado</button></div>`;
+  } else if(s===7){
+    main=`<div class="lbl">Verificar el certificado contra la OT</div>
+    <div class="mail"><b>Certificado Vista N° [N°].pdf</b><span class="note">Recibido por mail y adjuntado a la OC 4500123</span></div>
+    <div class="scroll-x"><table class="tbl"><tr><th>OT</th><th>Línea</th><th>Conformada</th><th>Certificado</th><th></th><th>Diferencia</th></tr>
+    <tr><td class="mono">OT-0148</td><td>20</td><td><b>${fh(h)}</b></td><td><b>${fh(c)}</b></td><td>${pill('No coincide','bad')}</td><td style="color:var(--bad);font-weight:600">Faltan ${fh(h-c)}</td></tr></table></div>
+    <div style="font-size:15px">Se factura lo certificado: <b>${fh(c)} × [PRECIO]</b>. Las <b style="color:var(--bad)">${fh(h-c)}</b> vuelven al reclamo semanal.</div>
+    <div class="btns"><button class="btn" type="button" data-act="listoFact">Listo para facturar</button></div>`;
+  } else if(s===8){
+    main=`<div class="lbl">Facturar lo certificado</div>
+    <dl class="kv"><dt>Factura</dt><dd>${fh(c)} × [PRECIO] · OC 4500123, línea 20</dd><dt>OT cubierta</dt><dd class="mono">OT-0148 · certificada parcial</dd><dt>En reclamo</dt><dd><b style="color:var(--bad)">${fh(conf()-c)}</b> · próximo reclamo en 7 días</dd></dl>
+    <div class="btns"><button class="btn" type="button" data-act="factura">Registrar factura</button></div>`;
+  } else if(s===9){
+    main=`<div class="lbl">Factura registrada</div>
+    <dl class="kv"><dt>Importe</dt><dd>${fh(c)} × [PRECIO]</dd><dt>Estado</dt><dd>${pill('Esperando cobro','warn')}</dd></dl>
+    <div class="btns"><button class="btn" type="button" data-act="cobro">Registrar cobro</button></div>`;
+  } else {
+    main=`<div class="msg">OT-0148 cobrada. Cobrado: ${fh(c)}. Sigue en reclamo: ${fh(conf()-c)}.</div>
+    <div class="note">La diferencia no se pierde: queda en el reclamo semanal hasta que se certifica o se marca como perdida con un motivo.</div>
+    <div class="btns"><button class="btn" type="button" data-act="reset">Volver a empezar</button></div>`;
+  }
+  return `<div class="card"><div class="who"><div class="lbl">OT-0148 · seguimiento</div>${pill('Rol: Administración','info')}</div>${pipeStrip()}${main}${saldoBar()}</div>`;
+}
+
+/* Celular */
+function sigChip(){return `<button type="button" class="sig" data-act="signal" style="background:var(--${S.signal?'ok-bg':'warn-bg'});color:var(--${S.signal?'ok':'warn'})" title="Tocá para simular que cambia la señal">${S.signal?'Con señal':'Sin señal'}</button>`}
+function head(t,sub,back){return `<div class="ph-head">${back?`<button type="button" data-act="${back}" aria-label="Volver" style="background:none;border:0;color:inherit;font-size:22px;cursor:pointer;padding:0 6px 0 0">‹</button>`:''}<div class="t"><b>${t}</b><span>${sub}</span></div>${sigChip()}</div>`}
+
+function phone(){
+  const s=S.step, h=hOT();
+  if(s===0){return head('Mis OT de hoy','Técnico · Patagonia Servicios')+`<div class="ph-body">
+    <div class="pc"><div style="display:flex;justify-content:space-between"><span class="mono">OT-0149</span>${pill('En proceso','warn')}</div><b>Calibración de manómetros</b><span class="note">Vista · Bajada del Palo · OC 4500123 · línea 30</span></div>
+    <div class="pc"><div style="display:flex;justify-content:space-between"><span class="mono">OT-0145</span>${pill('Espera firma','mute')}</div><b>Slickline · calibración de pozo</b></div>
+    <div class="note" style="text-align:center;padding:12px">Esperando nuevas OT de la oficina…</div></div>`}
+  if(s===1){return head('Mis OT de hoy','Técnico · Patagonia Servicios')+`<div class="ph-body">
+    <div class="pc" style="border:2px solid var(--accent)"><div style="display:flex;justify-content:space-between"><span class="mono">OT-0148</span>${pill('Asignada · nueva','info')}</div>
+     <b style="font-size:17px">Slickline · registro de presión de fondo</b><span class="note">Vista · Bandurria Sur · Pozo BS-1024<br>OC 4500123 · línea 20 · 8 h planificadas</span><span class="note">Equipo: WINCH-PAT-01 · PA100DE</span>
+     <button class="btn" type="button" data-act="empezar" style="min-height:48px">Empezar la OT</button></div>
+    <div class="pc"><div style="display:flex;justify-content:space-between"><span class="mono">OT-0149</span>${pill('En proceso','warn')}</div><b>Calibración de manómetros</b></div></div>`}
+  if(s===2){
+    const t=S.tasks, hh=horas();
+    const tIni=S.ini!=null?`<button class="tile set" type="button" data-act="ini"><b>Inicio</b><span>${fm(S.ini)}</span></button>`:`<button class="tile" type="button" data-act="ini"><b>Inicio</b><span>Tocar</span></button>`;
+    const tEsp=S.eFin!=null?`<button class="tile set" type="button" disabled><b>Espera</b><span>${fm(S.eIni)}–${fm(S.eFin)}</span></button>`:S.eIni!=null?`<button class="tile wait" type="button" data-act="esp"><b>Espera</b><span>${fm(S.eIni)} · tocar al terminar</span></button>`:`<button class="tile" type="button" data-act="esp" ${S.ini==null||S.fin!=null?'disabled':''}><b>Espera</b><span>Opcional</span></button>`;
+    const tFin=S.fin!=null?`<button class="tile set" type="button" disabled><b>Fin</b><span>${fm(S.fin)}</span></button>`:`<button class="tile" type="button" data-act="fin" ${S.ini==null||(S.eIni!=null&&S.eFin==null)?'disabled':''}><b>Fin</b><span>Tocar</span></button>`;
+    return head('OT-0148','Vista · Bandurria Sur · BS-1024','atras1')+`<div class="ph-body">
+     <div class="oc-box"><span style="font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase">Lo que dice la OC</span><b>OC 4500123 · línea 20 · Slickline</b><span>Unidad: hora · Quedan 96 de 160 h</span><span style="color:var(--ok)">Personal habilitado: Juan Pérez, Lucía Fernández</span></div>
+     <div class="pc"><b>Trabajo realizado</b><span class="note">Reloj de la OT · 07/10/2026</span><div class="clock">${tIni}${tEsp}${tFin}</div>
+      <div style="display:flex;justify-content:space-between;border-top:1px solid var(--line);padding-top:8px"><span>A presentar</span><b>${hh!=null?fh(hh)+' productivas':'—'}</b></div>
+      ${['Bajada de herramienta y registro','Lectura de memoria y respaldo de datos','Desmontaje y limpieza de locación'].map((x,i)=>`<label style="display:flex;gap:10px;align-items:center;min-height:36px;font-size:14px"><input type="checkbox" data-task="${i}" ${t[i]?'checked':''}>${x}</label>`).join('')}
+      <span class="note">Fotos (${S.fotos})</span><div class="photos">${'<i></i>'.repeat(S.fotos)}${S.fotos<7?'<button type="button" data-act="foto" aria-label="Agregar foto">+</button>':''}</div></div></div>
+     <div class="ph-foot"><button class="btn" type="button" data-act="generada" ${hh==null?'disabled':''}>Terminar y generar la OT</button></div>`}
+  if(s===3){
+    return head('OT-0148 generada','Lista para firma')+`<div class="ph-body">
+     <div class="pc"><div class="pdf"><div class="sheet"><i></i><i></i><i></i><i></i><i></i></div><div style="display:flex;flex-direction:column;gap:4px"><b>OT-0148 generada</b><span class="note">PDF con la línea de OC, horas, tareas, personal, equipo y ${S.fotos} fotos</span></div></div>
+      <dl class="kv"><dt>Cantidad</dt><dd><b>${fh(h)}</b>${S.eFin!=null?` · espera ${fm(S.eFin-S.eIni).replace(/^0/,'')} aparte`:''}</dd><dt>Horario</dt><dd>${fm(S.ini)} a ${fm(S.fin)}</dd><dt>Línea</dt><dd class="mono">4500123 / 20</dd></dl></div></div>
+     <div class="ph-foot"><b style="font-size:14px">¿Cómo firma el inspector?</b><button class="btn" type="button" data-act="firmaAqui">Está acá: firma en este celular</button><button class="btn sec" type="button" data-act="firmaRemoto">No está: enviarle la OT por WhatsApp o mail</button></div>`}
+  if(s===4&&S.mode==='aqui'){
+    return head('Aprobar OT-0148','Inspector · Vista','atras3')+`<div class="ph-body">
+      <div class="pc"><dl class="kv"><dt>Servicio</dt><dd>Slickline · registro de presión</dd><dt>OC / línea</dt><dd class="mono">4500123 / 20</dd><dt>Fecha y horas</dt><dd>07/10/2026 · ${fm(S.ini)} a ${fm(S.fin)}</dd><dt>Cantidad</dt><dd><b>${fh(h)}</b></dd></dl></div>
+      <div class="pc"><b>Firma electrónica</b><div class="sigbox"><canvas id="sigc"></canvas><span>Firmá con el dedo dentro del recuadro</span></div>
+      <button type="button" class="reset" data-act="borrar" style="min-height:36px;align-self:flex-start">Borrar</button>
+      <label style="display:flex;gap:10px;align-items:flex-start;font-size:14px"><input type="checkbox" id="conf" checked>Confirmo que el servicio se realizó como se describe</label>
+      <label class="dsc"><input type="checkbox" id="desc" ${S.desc?'checked':''}>Descuento 0,25 h por demora en el montaje (opcional, para ver la diferencia)</label></div>
+      <div class="note">Queda registro de la fecha, la hora y el lugar de la firma.</div></div>
+     <div class="ph-foot"><button class="btn" id="btn-sign" type="button" data-act="aprobar" disabled>Aprobar y firmar</button></div>`}
+  if(s===4){
+    const can=S.canal==='whatsapp';
+    const e=S.envio;
+    return head('Enviar OT-0148 a firma','El inspector no está en el pozo','atras3')+`<div class="ph-body">
+      <div class="pc"><div class="pdf"><div class="sheet"><i></i><i></i><i></i><i></i><i></i></div><div style="display:flex;flex-direction:column;gap:4px"><b>OT-0148 generada</b><span class="note">PDF con ${S.fotos} fotos y ${fh(h)}</span></div></div></div>
+      <div class="pc"><b style="font-size:14px">Enviar por</b>
+       <div class="seg"><button type="button" data-act="canalW" class="${can?'on':''}" ${e!=='idle'?'disabled':''}>WhatsApp</button><button type="button" data-act="canalM" class="${can?'':'on'}" ${e!=='idle'?'disabled':''}>Mail</button></div>
+       <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:500">${can?'Celular':'Mail'} del inspector<input class="inp" id="dest" type="text" value="${can?'[CELULAR DEL INSPECTOR]':'[MAIL DEL INSPECTOR]'}"></label>
+       <div class="note">Le llega un enlace: abre la OT y firma electrónicamente desde su celular.</div></div>
+      <div class="pc"><b style="font-size:14px">Seguimiento de la firma</b><div class="trk">
+        <div class="ok"><b>1</b><span>OT generada · 07/10 16:05</span></div>
+        <div class="${e==='enviado'?'ok':e==='cola'?'wt':''}"><b>2</b><span>${e==='enviado'?(can?'WhatsApp':'Mail')+' enviado al inspector':e==='cola'?'En cola · sale al volver la señal':'Enviar al inspector'}</span></div>
+        <div><b>3</b><span>El inspector firma</span></div><div><b>4</b><span>Te llega la OT firmada y queda guardada en la OT</span></div></div></div>
+      ${e==='enviado'?`<label class="dsc"><input type="checkbox" id="desc" ${S.desc?'checked':''}>El inspector descuenta 0,25 h por demora en el montaje (opcional)</label><button class="sim" type="button" data-act="inspFirma">Simular: el inspector firma desde su celular</button>`:''}
+      ${e==='cola'?`<div class="note">El celular no tiene señal. En 5 segundos vuelve solo (o tocá <b>Sin señal</b> arriba).</div>`:''}</div>
+     <div class="ph-foot"><button class="btn" type="button" data-act="enviar" ${e!=='idle'?'disabled':''}>Enviar para firma</button><div class="note" style="text-align:center">Si no firma en 48 h, se le manda un recordatorio</div></div>`}
+  const est=PIPE[PIDX[s]];const k=['','','','','','ok','info','info','info','info','ok'][s]||'info';
+  return head('Mis OT de hoy','Técnico · Patagonia Servicios')+`<div class="ph-body">
+    <div class="pc"><div style="display:flex;justify-content:space-between"><span class="mono">OT-0148</span>${pill(est,s>=5?'ok':'info')}</div><b style="font-size:17px">Slickline · registro de presión de fondo</b><span class="note">${S.mode==='aqui'?'Firmada en este celular':'Firmada por el inspector'} · ${fh(h)}</span></div>
+    <div class="pc"><div style="display:flex;justify-content:space-between"><span class="mono">OT-0149</span>${pill('En proceso','warn')}</div><b>Calibración de manómetros</b></div>
+    <div class="note" style="text-align:center;padding:10px">La OT firmada llegó a la oficina. El seguimiento sigue allá.</div></div>`;
+}
+
+function steps(){
+  $('steps').innerHTML=GRUPOS.map(([n,idx])=>{const done=idx.every(i=>i<S.step)||(S.step===10&&idx.includes(10));const now=idx.includes(S.step)&&!(S.step===10);return `<span class="chip ${now?'now':done?'done':''}">${done?'✓ ':''}${n}</span>`}).join('');
+}
+const AUTO={k:null,id:null,iv:null,end:0,txt:''};
+function autoClear(){clearTimeout(AUTO.id);clearInterval(AUTO.iv);AUTO.k=null;AUTO.txt=''}
+function autoSet(k,txt,fn){
+  if(AUTO.k===k)return; autoClear();
+  AUTO.k=k;AUTO.txt=txt;AUTO.end=Date.now()+5000;
+  AUTO.iv=setInterval(hint,500);
+  AUTO.id=setTimeout(()=>{autoClear();fn();},5000);
+}
+function autoSchedule(){
+  const s=S.step;
+  if(s===4&&S.mode==='remoto'&&S.envio==='enviado')autoSet('insp','el inspector firma solo (simulado)',()=>{if(S.step===4)go(5,'El inspector firmó desde su celular. La OT firmada llegó a la oficina y al técnico.')});
+  else if(s===4&&S.mode==='remoto'&&S.envio==='cola')autoSet('senal','el celular recupera la señal y sale el mensaje (simulado)',()=>{if(S.step===4&&S.envio==='cola'){S.signal=true;syncNow('07/10 16:20');S.envio='enviado';addLog('e','07/10 16:21','Firma pedida al inspector por '+(S.canal==='whatsapp'?'WhatsApp':'mail'));render()}});
+  else if(s===6&&S.reclamos===0)autoSet('dias','pasan 7 días y sale el reclamo (simulado)',()=>{if(S.step===6){S.dias=7;S.reclamos=1;addLog('r','15/10 09:00','Reclamo 1 enviado al certificador, con copia a Administración');render()}});
+  else if(s===6)autoSet('cert','llega el certificado de la operadora (simulado)',()=>{if(S.step===6)go(7)});
+  else autoClear();
+}
+function hint(){
+  let t=HINTS[S.step];
+  if(S.step===4)t=S.mode==='aqui'?'Inspector: firmá con el dedo o el mouse dentro del recuadro y apretá Aprobar y firmar.':'Elegí WhatsApp o mail y apretá Enviar para firma. Después el inspector firma solo en 5 segundos.';
+  if(AUTO.k&&AUTO.txt)t+='  ⏳ '+AUTO.txt+' en '+Math.max(0,Math.ceil((AUTO.end-Date.now())/1000))+' s';
+  $('hint').textContent=t;
+}
+function focus(){const phoneSide=S.step>=1&&S.step<=4;$('stage').dataset.focus=phoneSide?'phone':'office';$('phone-note').textContent=phoneSide?'Celular del técnico':'';}
+
+function render(){
+  autoSchedule();steps();hint();focus();
+  $('office').innerHTML=office();$('phone').innerHTML=phone();
+  if(S.step===4&&S.mode==='aqui')initSig();
+}
+
+function initSig(){
+  const c=$('sigc');if(!c)return;const r=c.getBoundingClientRect();const d=window.devicePixelRatio||1;c.width=Math.max(1,r.width*d);c.height=Math.max(1,r.height*d);
+  const x=c.getContext('2d');x.scale(d,d);x.lineWidth=2.6;x.lineCap='round';x.lineJoin='round';x.strokeStyle='#16202B';
+  let dw=false;
+  const pos=e=>{const b=c.getBoundingClientRect();return [e.clientX-b.left,e.clientY-b.top]};
+  c.addEventListener('pointerdown',e=>{dw=true;c.setPointerCapture(e.pointerId);const [a,b]=pos(e);x.beginPath();x.moveTo(a,b);x.lineTo(a+.1,b+.1);x.stroke()});
+  c.addEventListener('pointermove',e=>{if(!dw)return;const [a,b]=pos(e);x.lineTo(a,b);x.stroke()});
+  const up=()=>{if(!dw)return;dw=false;S.ink=true;const b=$('btn-sign');if(b)b.disabled=false};
+  c.addEventListener('pointerup',up);c.addEventListener('pointercancel',up);
+  c.clear=()=>{x.clearRect(0,0,c.width,c.height);S.ink=false;const b=$('btn-sign');if(b)b.disabled=true};
+  c.style.background='#FFFFFF';
+}
+
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');if(!b||b.disabled)return;const a=b.dataset.act;
+  switch(a){
+    case 'reset':autoClear();init();render();break;
+    case 'generar':go(1);break;
+    case 'empezar':go(2);break;
+    case 'atras1':go(1);break;
+    case 'ini':if(S.ini==null){S.ini=450;render()}break;
+    case 'esp':if(S.eIni==null){S.eIni=660}else if(S.eFin==null){S.eFin=690}render();break;
+    case 'fin':if(S.fin==null){S.fin=960;render()}break;
+    case 'foto':S.fotos++;render();break;
+    case 'generada':go(3);break;
+    case 'atras3':S.mode=null;S.ink=false;S.envio='idle';go(3);break;
+    case 'firmaAqui':S.mode='aqui';S.ink=false;go(4);break;
+    case 'firmaRemoto':S.mode='remoto';S.envio='idle';go(4);break;
+    case 'borrar':{const c=$('sigc');if(c&&c.clear)c.clear();break}
+    case 'aprobar':if(S.ink){go(5,'OT firmada por el inspector. El celular sincronizó con la oficina.')}break;
+    case 'canalW':S.canal='whatsapp';render();break;
+    case 'canalM':S.canal='mail';render();break;
+    case 'enviar':if(S.signal){S.envio='enviado';syncNow('07/10 16:06');addLog('e','07/10 16:06','Firma pedida al inspector por '+(S.canal==='whatsapp'?'WhatsApp':'mail'))}else{S.envio='cola';addLog('q','07/10 16:06','Firma en cola: el celular no tiene señal')}render();break;
+    case 'signal':S.signal=!S.signal;if(S.signal&&S.step>=3){syncNow('07/10 16:20');if(S.envio==='cola'){S.envio='enviado';addLog('e','07/10 16:21','Firma pedida al inspector por '+(S.canal==='whatsapp'?'WhatsApp':'mail'))}}render();break;
+    case 'inspFirma':go(5,'El inspector firmó desde su celular. La OT firmada llegó a la oficina y al técnico.');break;
+    case 'descargar':S.dl=true;S.msg='Paquete descargado: Vista_OC4500123_OT-0148 firmada.zip (simulado).';render();break;
+    case 'subido':S.dl=false;S.msg='';go(6);break;
+    case 'dias':S.dias=7;S.reclamos=1;addLog('r','15/10 09:00','Reclamo 1 enviado al certificador, con copia a Administración');render();break;
+    case 'llegoCert':go(7);break;
+    case 'listoFact':go(8);break;
+    case 'factura':go(9);break;
+    case 'cobro':go(10);break;
+  }
+});
+document.addEventListener('change',e=>{const t=e.target;if(t.dataset&&t.dataset.task!=null){S.tasks[+t.dataset.task]=t.checked}if(t.id==='desc'){S.desc=t.checked}});
+render();
+</script>
+
+</body></html>
