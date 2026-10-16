@@ -3,7 +3,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* Layout: oficina a la izquierda, celular a la derecha; en pantallas angostas se apilan y arriba queda el lado que actúa. */
+/* Escritorio/notebook: oficina + celular; notebook compacta por altura. Móvil: una pantalla (supervisor → técnico → administración). */
 :root{
   --bg:#F2F3F1; --surface:#FFFFFF; --ink:#16202B; --muted:#4F5B66; --line:#D9DDE0; --chip:#EDEFF1;
   --accent:#C2410C; --accent-ink:#FFFFFF; --bar:#16202B; --bar-ink:#FFFFFF; --bar-muted:#C9D1D9;
@@ -26,17 +26,131 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);margin:0;padd
 button{font-family:inherit;color:inherit}
 button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .wrap{max-width:1240px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
-.top{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between}
+.top{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:12px;row-gap:8px;align-items:start}
 .top h1{margin:0;font-size:22px;font-weight:700;text-wrap:balance}
 .top .sub{color:var(--muted);font-size:14px}
+.top-copy{min-width:0;grid-column:1;grid-row:1}
+.top-reset{grid-column:2;grid-row:1;justify-self:end;align-self:start;white-space:nowrap;flex-shrink:0}
 .reset{min-height:40px;padding:0 16px;border-radius:10px;border:1px solid var(--field-line);background:var(--surface);font-weight:600;font-size:14px;cursor:pointer}
 .steps{display:flex;flex-wrap:wrap;gap:8px}
 .chip{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;font-size:13px;font-weight:600;background:var(--surface);border:1px solid var(--line);color:var(--muted)}
 .chip.done{color:var(--ok);background:var(--ok-bg);border-color:transparent}
 .chip.now{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .hint{background:var(--info-bg);color:var(--info);border-radius:12px;padding:12px 16px;font-weight:600;font-size:15px}
-.stage{display:grid;grid-template-columns:minmax(0,1fr) 410px;gap:24px;align-items:start}
-@media (max-width:960px){.stage{grid-template-columns:minmax(0,1fr)}.stage[data-focus="phone"] .phone-col{order:-1}}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) min(360px,34vw);gap:20px;align-items:start}
+.stage[data-view="office"],.stage[data-view="phone"]{grid-template-columns:minmax(0,1fr)}
+.stage[data-view="office"] .phone-col,.stage[data-view="phone"] .office-col{display:block}
+@media (max-width:960px){
+  body{padding-inline:max(12px,env(safe-area-inset-left)) max(12px,env(safe-area-inset-right));padding-block:10px max(14px,env(safe-area-inset-bottom));font-size:14px}
+  .wrap{gap:10px;max-width:none}
+  .top{column-gap:8px}
+  .top h1{font-size:1.05rem;line-height:1.25}
+  .top-reset{min-height:36px;padding:0 10px;font-size:12px}
+  .steps{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;gap:6px;margin:0 -2px;padding:2px 2px 4px}
+  .steps::-webkit-scrollbar{display:none}
+  .steps .chip{flex:0 0 auto;padding:6px 11px;font-size:11px}
+  .hint{padding:9px 11px;font-size:12px;line-height:1.35;font-weight:600}
+  .foot{display:none}
+  .stage{grid-template-columns:minmax(0,1fr);gap:8px}
+  .stage[data-view="office"] .phone-col{display:none!important}
+  .stage[data-view="phone"]{display:flex;flex-direction:column;gap:8px}
+  .stage[data-view="phone"] .phone-col{order:1}
+  .stage[data-view="phone"] .office-col{display:block!important;order:2;min-width:0;max-height:none;overflow:visible}
+  .stage[data-view="phone"][data-gantt-first="1"] .office-col{order:1}
+  .stage[data-view="phone"][data-gantt-first="1"] .phone-col{order:2}
+  .stage[data-view="phone"][data-gantt-first="1"] .phone,
+  .stage[data-view="phone"][data-gantt-first="1"] .screen{max-height:min(40dvh,340px);min-height:200px}
+  .stage[data-view="phone"][data-gantt-first="1"] .linea-card .note-linea,
+  .stage[data-view="phone"][data-gantt-first="1"] .linea-card .qgrid{display:none}
+  .stage[data-view="phone"][data-gantt-first="1"] .linea-card .lbl:first-of-type{margin-top:0}
+  .stage[data-view="phone"] .office-col .stack{display:contents}
+  .stage[data-view="phone"] .office-col .card:not(.linea-card){display:none!important}
+  .stage[data-view="office"] .office-col{min-width:0;max-height:none;overflow:visible}
+  .office-col .card{padding:14px;gap:12px}
+  .office-col .pipe span{font-size:10px;padding:4px 8px}
+  .office-col .kv{grid-template-columns:minmax(0,1fr);gap:2px 0}
+  .office-col .kv dt{font-size:11px;margin-top:6px}
+  .office-col .kv dt:first-child{margin-top:0}
+  .office-col .qgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .office-col .q{padding:8px 9px}.office-col .q b{font-size:16px}
+  .office-col .grow{grid-template-columns:52px minmax(0,1fr);gap:6px}
+  .office-col .linea-card .gantt{width:100%;min-width:0;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+  .office-col .linea-card .grow{min-width:260px}
+  .office-col .linea-card .gtr{height:28px;min-width:0}
+  .office-col .linea-card .gax,.office-col .linea-card .gtaps,.office-col .linea-card .gsum{margin-left:52px;max-width:calc(100% - 52px);font-size:10px;line-height:1.3}
+  .office-col .linea-card .gax{height:14px;margin-bottom:2px}
+  .office-col .linea-card .gs{font-size:10px}
+  .office-col .gtaps,.office-col .gsum,.office-col .gax{margin-left:58px;font-size:10px}
+  .office-col .log div{grid-template-columns:minmax(0,1fr);gap:2px;padding:8px 10px;font-size:13px}
+  .office-col .log .mono{padding-top:0;font-size:11px}
+  .stage[data-view="phone"] .phone-col{width:100%;max-width:none;margin:0;align-items:stretch}
+  .stage[data-view="phone"] .phone{width:100%;max-width:none;height:auto;min-height:min(72dvh,520px);max-height:calc(100dvh - 168px);border-radius:16px;padding:0;box-shadow:none;background:var(--surface);border:1px solid var(--line)}
+  .stage[data-view="phone"] .screen{border-radius:15px;min-height:min(72dvh,520px);max-height:calc(100dvh - 170px)}
+  .stage[data-view="phone"] .phone-note{text-align:center;font-size:12px;margin-top:2px}
+  .ph-head{padding:12px 12px 10px}
+  .ph-head .t b{font-size:16px}
+  .ph-head .t span{font-size:12px}
+  .sig{font-size:11px;padding:5px 10px}
+  .ph-body{padding:10px;gap:10px}
+  .ph-foot{padding:10px 12px 12px}
+  .ph-foot .btn{min-height:46px}
+  .pc{padding:12px;gap:8px}
+  .tile{min-height:52px;padding:8px 6px}
+  .btn{min-height:44px;font-size:14px}
+}
+@media (max-height:860px) and (min-width:961px){
+  body{padding-block:10px 14px;font-size:14px}
+  .wrap{gap:10px}
+  .top h1{font-size:18px;line-height:1.25}
+  .top .sub{font-size:13px}
+  .hint{padding:8px 12px;font-size:13px;line-height:1.35}
+  .chip{padding:6px 10px;font-size:12px}
+  .card{padding:14px;gap:11px;border-radius:12px}
+  .stage{gap:14px;grid-template-columns:minmax(0,1fr) min(300px,32vw)}
+  .phone{height:clamp(360px,50vh,520px);max-width:300px;border-radius:28px;padding:8px;box-shadow:0 12px 28px rgba(0,0,0,.18)}
+  .ph-head{padding:12px 12px 10px}.ph-body{padding:10px;gap:10px}.ph-foot{padding:10px 12px 12px}
+  .ph-foot .btn{min-height:44px}
+  .btn{min-height:42px;padding:0 16px;font-size:14px}
+  .row{min-height:42px;padding:8px 12px}
+  .stack{gap:11px}
+  .qgrid{gap:8px}
+  .q{padding:8px 10px}.q b{font-size:18px}
+  .grow{grid-template-columns:68px minmax(0,1fr);gap:8px}
+  .gtr{height:26px}
+  .gtaps,.gsum,.gax{margin-left:78px;font-size:11px}
+  .gax{height:14px}
+  .log div{padding:8px 10px;font-size:13px}
+  .foot{font-size:11px;line-height:1.35}
+  .office-col{max-height:calc(100vh - 168px);overflow-y:auto;overscroll-behavior:contain}
+}
+/* Notebook con oficina + celular: achicar tarjetas y cantidades para ver el Gantt sin bajar */
+@media (max-height:940px) and (min-width:961px){
+  .office-col .stack{gap:8px}
+  .office-col .card{padding:10px 12px;gap:8px;border-radius:11px}
+  .office-col .pipe{gap:4px}
+  .office-col .pipe span{font-size:10px;padding:3px 7px;line-height:1.2}
+  .office-col .msg{padding:7px 10px;font-size:12px;line-height:1.35}
+  .office-col .note{font-size:11px;line-height:1.3}
+  .office-col .linea-card .note-linea{display:none}
+  .office-col .linea-card .lbl{margin-top:2px}
+  .office-col .linea-card .qgrid{grid-template-columns:repeat(6,minmax(0,1fr));gap:5px}
+  .office-col .linea-card .q{padding:5px 6px;gap:1px;border-radius:7px}
+  .office-col .linea-card .q .lbl{font-size:9px;letter-spacing:.04em;line-height:1.15}
+  .office-col .linea-card .q b{font-size:13px;line-height:1.15}
+  .office-col .linea-card .q small{font-size:9px;line-height:1.15;-webkit-line-clamp:2;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden}
+  .office-col .gantt{gap:5px}
+  .office-col .grow{grid-template-columns:58px minmax(0,1fr);gap:5px}
+  .office-col .gl{font-size:10px}
+  .office-col .gtr{height:22px}
+  .office-col .gtaps,.office-col .gsum,.office-col .gax{margin-left:63px;font-size:10px}
+  .office-col .gax{height:12px}
+  .office-col .linea-card .historial-log{max-height:120px;overflow-y:auto;margin-top:4px}
+  .office-col .linea-card .historial-log div{padding:6px 8px;font-size:12px;grid-template-columns:88px minmax(0,1fr);gap:6px}
+  .office-col .bar{height:7px;margin-top:4px!important}
+}
+@media (max-height:780px) and (min-width:961px){
+  .office-col .linea-card .q small{display:none}
+}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:16px;min-width:0}
 .lbl{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .who{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
@@ -68,7 +182,7 @@ input[type=checkbox]{width:20px;height:20px;accent-color:var(--accent);flex:none
 .mail{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:14px;font-size:14px;display:flex;flex-direction:column;gap:6px}
 /* Celular */
 .phone-col{display:flex;flex-direction:column;gap:10px;align-items:center;min-width:0}
-.phone{width:100%;max-width:390px;height:800px;background:var(--bezel);border-radius:34px;padding:10px;box-shadow:0 18px 40px rgba(0,0,0,.22)}
+.phone{width:100%;max-width:390px;height:min(720px,78vh);background:var(--bezel);border-radius:34px;padding:10px;box-shadow:0 18px 40px rgba(0,0,0,.22)}
 .screen{width:100%;height:100%;border-radius:26px;overflow:hidden;background:var(--bg);display:flex;flex-direction:column}
 .ph-head{background:var(--bar);color:var(--bar-ink);padding:16px 16px 14px;display:flex;align-items:center;gap:10px}
 .ph-head .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
@@ -129,8 +243,8 @@ input[type=checkbox]{width:20px;height:20px;accent-color:var(--accent);flex:none
 
 <div class="wrap">
   <div class="top">
-    <div><h1>Módulo 2 · de la OT al cobro</h1><div class="sub">Oficina y celular en la misma pantalla. Apretá los botones para recorrer el proceso completo.</div></div>
-    <button class="reset" type="button" data-act="reset">Reiniciar demo</button>
+    <div class="top-copy"><h1>Módulo 2 · de la OT al cobro</h1></div>
+    <button class="reset top-reset" type="button" data-act="reset">Reiniciar demo</button>
   </div>
   <div class="steps" id="steps" aria-label="Etapas"></div>
   <div class="hint" id="hint" role="status"></div>
@@ -160,7 +274,7 @@ const HINTS=[
  'Listo. Recorriste el proceso de punta a punta.'
 ];
 let S;
-function init(){S={sync:false,desc:false,log:[],logk:{},step:0,signal:true,mode:null,canal:'whatsapp',envio:'idle',ini:null,eIni:null,eFin:null,fin:null,tasks:[true,true,false],fotos:2,ink:false,conf:true,dl:false,dias:0,reclamos:0,msg:''};}
+function init(){S={sync:false,desc:false,log:[],logk:{},step:0,signal:true,mode:null,canal:'whatsapp',envio:'idle',ini:null,eIni:null,eFin:null,fin:null,tasks:[true,true,false],fotos:2,ink:false,conf:true,dl:false,dias:0,reclamos:0,msg:'',mobGanttBeat:false};}
 init();
 const $=id=>document.getElementById(id);
 const fm=m=>String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
@@ -255,7 +369,7 @@ function gantt(){
   let ticks='';for(let h=7;h<=17;h++){ticks+=`<span style="left:${pos(h*60)}%">${String(h).padStart(2,'0')}</span>`}
   const esp=(S.eIni!=null&&S.eFin!=null)?(S.eFin-S.eIni):0;
   const sum=sy?`<div class="gsum"><span>Tiempo en el pozo <b>${hm(S.fin-S.ini)}</b></span><span>Productivo <b>${hm(S.fin-S.ini-esp)}</b></span><span>Improductivo <b>${hm(esp)}</b></span></div>`:'';
-  return `<div class="gantt"><div class="gax">${ticks}</div>
+  return `<div class="gantt" id="gantt-linea"><div class="gax">${ticks}</div>
    <div class="grow"><span class="gl">Planificado</span><div class="gtr">${seg(450,930,'p','Planificado · 8:00')}</div></div>
    <div class="grow"><span class="gl">Celular · OT-0148</span><div class="gtr">${real}</div></div>${tapsTxt}${sum}</div>`;
 }
@@ -263,18 +377,19 @@ function lineaCard(){
   const s=S.step; let notas='';
   if(s>=5&&S.desc)notas+=`<div class="mail"><span>Se hicieron ${fh((S.fin-S.ini)/60)} y el inspector conformó <b>${fh(conf())}</b>: <b>0,25 h no se cobran</b> (demora en el montaje).</span></div>`;
   if(s>=8)notas+=`<div class="mail"><span>El certificado reconoce <b>${fh(cert())}</b> sobre ${fh(conf())} conformadas: <b style="color:var(--bad)">${fh(conf()-cert())}</b> siguen en reclamo.</span></div>`;
-  return `<div class="card"><div class="who"><div class="lbl">Línea 20 · OT-0148</div>${pill(PIPE[PIDX[s]],'info')}</div>
-    <div class="note">Las seis cantidades de la línea. Cada una queda guardada y ninguna pisa a la otra.</div>
+  return `<div class="card linea-card"><div class="who"><div class="lbl">Línea 20 · OT-0148</div>${pill(PIPE[PIDX[s]],'info')}</div>
+    <div class="note note-linea">Las seis cantidades de la línea. Cada una queda guardada y ninguna pisa a la otra.</div>
     <div class="qgrid">${cantidades()}</div>${notas}
-    <div class="lbl">Gantt de la línea · 07/10</div>${gantt()}</div>`;
+    <div class="lbl">Gantt de la línea · 07/10</div>${gantt()}${historialBlock()}</div>`;
 }
-function historial(){
-  return `<div class="card"><div class="lbl">Historial de estados</div><div class="log">${S.log.slice().reverse().map(e=>`<div><span class="mono">${e[0]}</span><span>${e[1]}</span></div>`).join('')}</div></div>`;
+function historialBlock(){
+  if(S.step!==10)return'';
+  return `<div class="lbl">Historial de eventos</div><div class="log historial-log">${S.log.slice().reverse().map(e=>`<div><span class="mono">${e[0]}</span><span>${e[1]}</span></div>`).join('')}</div>`;
 }
 function office(){
   const s=S.step;
   const main=s===0?officeGenerar():s<5?officeVuelo():officeAdm();
-  return `<div class="stack">${main}${s>=1?lineaCard()+historial():''}</div>`;
+  return `<div class="stack">${main}${s>=1?lineaCard():''}</div>`;
 }
 
 function officeAdm(){
@@ -309,8 +424,7 @@ function officeAdm(){
     <div class="btns"><button class="btn" type="button" data-act="cobro">Registrar cobro</button></div>`;
   } else {
     main=`<div class="msg">OT-0148 cobrada. Cobrado: ${fh(c)}. Sigue en reclamo: ${fh(conf()-c)}.</div>
-    <div class="note">La diferencia no se pierde: queda en el reclamo semanal hasta que se certifica o se marca como perdida con un motivo.</div>
-    <div class="btns"><button class="btn" type="button" data-act="reset">Volver a empezar</button></div>`;
+    <div class="note">La diferencia no se pierde: queda en el reclamo semanal hasta que se certifica o se marca como perdida con un motivo. Para volver a empezar, usá <b>Reiniciar demo</b> arriba.</div>`;
   }
   return `<div class="card"><div class="who"><div class="lbl">OT-0148 · seguimiento</div>${pill('Rol: Administración','info')}</div>${pipeStrip()}${main}${saldoBar()}</div>`;
 }
@@ -404,12 +518,46 @@ function hint(){
   if(AUTO.k&&AUTO.txt)t+='  ⏳ '+AUTO.txt+' en '+Math.max(0,Math.ceil((AUTO.end-Date.now())/1000))+' s';
   $('hint').textContent=t;
 }
-function focus(){const phoneSide=S.step>=1&&S.step<=4;$('stage').dataset.focus=phoneSide?'phone':'office';$('phone-note').textContent=phoneSide?'Celular del técnico':'';}
+function mobileLayout(){return window.matchMedia('(max-width:960px)').matches}
+function stageView(){
+  const s=S.step;
+  if(!mobileLayout())return'split';
+  if(s===0)return'office';
+  if(s>=1&&s<=4)return'phone';
+  return'office';
+}
+function mobileGanttMoment(){return mobileLayout()&&S.step===2&&S.fin!=null}
+function focus(){
+  const s=S.step,view=stageView();
+  const st=$('stage');
+  st.dataset.view=view;
+  st.dataset.focus=view==='phone'?'phone':'office';
+  st.dataset.ganttFirst=mobileGanttMoment()?'1':'0';
+  const pn=$('phone-note');
+  if(view==='phone')pn.textContent=mobileGanttMoment()?'Trabajo terminado · Gantt de la línea':'Celular del técnico';
+  else if(view==='office'&&mobileLayout())pn.textContent=s===0?'Supervisor · oficina':'Administración · oficina';
+  else pn.textContent='';
+}
+let demoPauseUntil=0;
+function afterMobileGanttFocus(){
+  if(!mobileGanttMoment()||S.mobGanttBeat)return;
+  S.mobGanttBeat=true;
+  demoPauseUntil=Date.now()+3200;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    const el=document.getElementById('gantt-linea')||document.querySelector('.linea-card');
+    if(!el)return;
+    const y=el.getBoundingClientRect().top+window.scrollY-10;
+    window.scrollTo({top:Math.max(0,y),behavior:'smooth'});
+  }));
+}
+window.addEventListener('resize',()=>{if(typeof S!=='undefined')focus()});
 
 function render(){
-  autoSchedule();steps();hint();focus();
+  autoSchedule();steps();hint();
   $('office').innerHTML=office();$('phone').innerHTML=phone();
   if(S.step===4&&S.mode==='aqui')initSig();
+  focus();
+  afterMobileGanttFocus();
 }
 
 function initSig(){
@@ -428,7 +576,7 @@ function initSig(){
 document.addEventListener('click',e=>{
   const b=e.target.closest('[data-act]');if(!b||b.disabled)return;const a=b.dataset.act;
   switch(a){
-    case 'reset':autoClear();init();render();break;
+    case 'reset':autoClear();stopDemoAuto();init();render();startDemoAuto();break;
     case 'generar':go(1);break;
     case 'empezar':go(2);break;
     case 'atras1':go(1);break;
@@ -457,7 +605,70 @@ document.addEventListener('click',e=>{
   }
 });
 document.addEventListener('change',e=>{const t=e.target;if(t.dataset&&t.dataset.task!=null){S.tasks[+t.dataset.task]=t.checked}if(t.id==='desc'){S.desc=t.checked}});
+
+function clickAct(a){
+  const b=document.querySelector(`[data-act="${a}"]:not(:disabled)`);
+  if(b){b.click();return true}
+  return false;
+}
+function simulateSig(){
+  const c=$('sigc');
+  if(!c)return false;
+  const r=c.getBoundingClientRect();
+  const d=window.devicePixelRatio||1;
+  if(!c.width){c.width=Math.max(1,r.width*d);c.height=Math.max(1,r.height*d)}
+  const x=c.getContext('2d');
+  if(!x)return false;
+  x.setTransform(d,0,0,d,0,0);
+  x.lineWidth=2.6;x.lineCap='round';x.lineJoin='round';x.strokeStyle='#16202B';
+  x.beginPath();x.moveTo(r.width*.15,r.height*.55);x.quadraticCurveTo(r.width*.5,r.height*.35,r.width*.85,r.height*.5);x.stroke();
+  S.ink=true;
+  const btn=$('btn-sign');
+  if(btn)btn.disabled=false;
+  return true;
+}
+let demoAutoIv=null;
+function stopDemoAuto(){if(demoAutoIv!=null){clearInterval(demoAutoIv);demoAutoIv=null}}
+function startDemoAuto(){if(demoAutoIv!=null)return;demoAutoIv=setInterval(demoAutoTick,1000)}
+function demoAutoTick(){
+  if(Date.now()<demoPauseUntil)return;
+  const s=S.step;
+  if(s>=10){stopDemoAuto();return}
+  if(s===0){clickAct('generar');return}
+  if(s===1){clickAct('empezar');return}
+  if(s===2){
+    if(S.ini==null){clickAct('ini');return}
+    if(S.eIni==null){clickAct('esp');return}
+    if(S.eFin==null){clickAct('esp');return}
+    if(S.fin==null){clickAct('fin');return}
+    clickAct('generada');return;
+  }
+  if(s===3){clickAct('firmaAqui');return}
+  if(s===4&&S.mode==='aqui'){
+    if(!S.ink){simulateSig();return}
+    clickAct('aprobar');return;
+  }
+  if(s===4&&S.mode==='remoto'){
+    if(S.envio==='cola'&&!S.signal){clickAct('signal');return}
+    if(S.envio==='idle'){clickAct('enviar');return}
+    if(S.envio==='enviado'){clickAct('inspFirma');return}
+    return;
+  }
+  if(s===5){
+    if(!S.dl){clickAct('descargar');return}
+    clickAct('subido');return;
+  }
+  if(s===6){
+    if(S.reclamos===0){clickAct('dias');return}
+    clickAct('llegoCert');return;
+  }
+  if(s===7){clickAct('listoFact');return}
+  if(s===8){clickAct('factura');return}
+  if(s===9){clickAct('cobro');return}
+}
+
 render();
+startDemoAuto();
 </script>
 
 </body></html>
